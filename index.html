@@ -3,25 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WROX VIP PANEL v10</title>
+    <title>WROX VIP PANEL v13.0</title>
     <style>
         body { background-color: #000; color: #00ff00; font-family: 'Segoe UI', sans-serif; margin: 0; padding: 0; overflow-x: hidden; }
+        
+        /* VIP Login Ekranı */
         #loginBox { position: fixed; width: 100%; height: 100%; background: #000; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9999; }
-        .login-card { width: 85%; max-width: 350px; background: #0a0a0a; border: 1px solid #00ff00; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 0 20px rgba(0,255,0,0.4); }
-        .login-card input { width: 100%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid #00ff00; color: #00ff00; text-align: center; outline: none; }
+        .login-card { width: 85%; max-width: 350px; background: #0a0a0a; border: 1px solid #00ff00; padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 0 20px rgba(0,255,0,0.5); }
+        .login-card input { width: 100%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid #00ff00; color: #00ff00; text-align: center; outline: none; border-radius: 5px; }
+
+        /* Üst Bar (Navbar) */
         .navbar { background: #0a0a0a; height: 60px; display: flex; align-items: center; padding: 0 20px; border-bottom: 1px solid #1a1a1a; position: fixed; width: 100%; top: 0; z-index: 1000; box-sizing: border-box; }
         .hamburger { font-size: 28px; cursor: pointer; margin-right: 15px; color: #00ff00; }
-        .brand { font-size: 18px; font-weight: bold; color: #00ff00; }
+        .brand { font-size: 18px; font-weight: bold; color: #00ff00; letter-spacing: 1px; }
+
+        /* Hamburger Menü (Sidebar) */
         .sidebar { position: fixed; left: -100%; top: 0; width: 80%; max-width: 300px; height: 100%; background: #0a0a0a; transition: 0.3s; z-index: 2000; border-right: 1px solid #00ff00; overflow-y: auto; }
         .sidebar.active { left: 0; }
-        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid #00ff00; color: #00ff00; font-size: 20px; }
-        .menu-item { padding: 18px 20px; border-bottom: 1px solid #111; cursor: pointer; transition: 0.2s; }
+        .sidebar-header { padding: 25px 20px; border-bottom: 1px solid #00ff00; color: #00ff00; font-size: 20px; font-weight: bold; }
+        .menu-item { padding: 18px 20px; border-bottom: 1px solid #111; cursor: pointer; transition: 0.2s; font-size: 15px; }
         .menu-item:active { background: #00ff00; color: #000; }
+
+        /* İçerik Alanı */
         .main-content { margin-top: 80px; padding: 15px; text-align: center; }
-        input { width: 100%; padding: 14px; margin: 8px 0; background: #0f0f0f; border: 1px solid #333; color: #00ff00; border-radius: 8px; box-sizing: border-box; outline: none; }
-        .btn-sorgu { background: #00ff00; color: #000; border: none; padding: 15px; width: 100%; font-weight: bold; border-radius: 8px; margin-top: 10px; cursor: pointer; }
+        input { width: 100%; padding: 14px; margin: 8px 0; background: #0f0f0f; border: 1px solid #333; color: #00ff00; border-radius: 8px; box-sizing: border-box; outline: none; font-size: 16px; }
+        .btn-sorgu { background: #00ff00; color: #000; border: none; padding: 15px; width: 100%; font-weight: bold; border-radius: 8px; margin-top: 10px; cursor: pointer; font-size: 16px; }
+
+        /* Sonuç Kutuları */
         #result { margin-top: 20px; text-align: left; display: none; }
-        .result-box { background: #0a0a0a; border: 1px solid #00ff00; padding: 12px; margin-bottom: 10px; border-radius: 6px; font-family: monospace; font-size: 13px; white-space: pre-wrap; word-break: break-all; }
+        .result-box { background: #0a0a0a; border: 1px solid #00ff00; padding: 12px; margin-bottom: 10px; border-radius: 6px; font-family: monospace; font-size: 13px; line-height: 1.6; white-space: pre-wrap; word-break: break-all; color: #00ff00; }
+        
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 1500; }
         .overlay.active { display: block; }
     </style>
@@ -30,21 +41,22 @@
 
 <div id="loginBox">
     <div class="login-card">
-        <h2>WROX PANEL</h2>
+        <h2 style="margin: 0;">WROX PANEL</h2>
+        <p style="color: #666; font-size: 12px;">VIP LOGIN</p>
         <input type="password" id="vipPass" placeholder="VIP Şifrenizi Girin">
         <button class="btn-sorgu" onclick="checkPass()">GİRİŞ YAP</button>
-        <p id="error" style="color: #ff3333; display: none; margin-top: 10px;">⚠️ Şifre Hatalı!</p>
+        <p id="error" style="color: #ff3333; display: none; margin-top: 10px; font-size: 13px;">⚠️ Şifre Hatalı!</p>
     </div>
 </div>
 
 <div id="panelUI" style="display: none;">
     <div class="navbar">
         <div class="hamburger" onclick="toggleMenu()">☰</div>
-        <div class="brand">WROX v10.0 FINAL</div>
+        <div class="brand">WROX v13.0 FINAL</div>
     </div>
 
     <div class="sidebar" id="sidebar">
-        <div class="sidebar-header">MENÜ</div>
+        <div class="sidebar-header">SORGU LİSTESİ</div>
         <div class="menu-item" onclick="openForm('tc')">💳 TC Sorgu</div>
         <div class="menu-item" onclick="openForm('tcpro')">💎 TC Sorgu (PRO)</div>
         <div class="menu-item" onclick="openForm('adsoyad')">👥 Ad Soyad Sorgu</div>
@@ -57,14 +69,14 @@
         <div class="menu-item" onclick="openForm('gsmtc')">📲 GSM-TC Sorgu</div>
         <div class="menu-item" onclick="openForm('operator')">📶 Operatör Sorgu</div>
         <div class="menu-item" onclick="openForm('iban')">🏦 IBAN Sorgu</div>
-        <div class="menu-item" onclick="location.reload()" style="color: #ff3333;">🚩 Çıkış</div>
+        <div class="menu-item" onclick="location.reload()" style="color: #ff3333; border-top: 1px solid #333;">🚩 Panelden Çıkış</div>
     </div>
 
     <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
 
     <div class="main-content">
         <div class="form-container">
-            <h3 id="panelTitle" style="color: #00ff00;">Sorgu Seçin</h3>
+            <h3 id="panelTitle" style="color: #00ff00;">İşlem Seçin</h3>
             <div id="inputs"></div>
             <button id="searchBtn" class="btn-sorgu" style="display: none;" onclick="runQuery()">SORGULA</button>
             <div id="result"></div>
@@ -73,8 +85,10 @@
 </div>
 
 <script>
-    const correctPass = "Özelpanel"; 
+    const correctPass = "Efecan1903"; 
     const apiBase = "https://punisher.alwaysdata.net/apiservices/";
+    // CORS bypass proxy sunucusu
+    const proxyUrl = "https://api.allorigins.win/get?url=";
 
     function checkPass() {
         if(document.getElementById('vipPass').value === correctPass) {
@@ -95,14 +109,14 @@
         const res = document.getElementById('result');
         inputs.innerHTML = ''; res.innerHTML = ''; res.style.display = 'none';
         document.getElementById('searchBtn').style.display = 'block';
-        document.getElementById('panelTitle').innerText = type.toUpperCase().replace('OKULNO', 'OKUL NO');
+        document.getElementById('panelTitle').innerText = type.toUpperCase().replace('OKULNO', 'OKUL NUMARASI');
 
         if(type.includes('tc') || type.includes('aile') || type === 'adres' || type === 'okulno') {
             inputs.innerHTML = '<input id="i1" type="tel" placeholder="TC Numarası">';
         } else if(type.includes('adsoyad')) {
             inputs.innerHTML = '<input id="i1" placeholder="Ad"><input id="i2" placeholder="Soyad">' + (type.includes('pro') ? '<input id="i3" placeholder="İl">' : '');
         } else if(type === 'operator' || type === 'gsmtc') {
-            inputs.innerHTML = '<input id="i1" type="tel" placeholder="GSM (Örn: 541...)">';
+            inputs.innerHTML = '<input id="i1" type="tel" placeholder="GSM No (Başında 0 olmadan)">';
         } else if(type === 'iban') {
             inputs.innerHTML = '<input id="i1" placeholder="TR...">';
         }
@@ -111,7 +125,7 @@
     async function runQuery() {
         const resDiv = document.getElementById('result');
         resDiv.style.display = 'block';
-        resDiv.innerHTML = '<div class="result-box">📡 Bağlanıyor...</div>';
+        resDiv.innerHTML = '<div class="result-box">📡 Güvenli Bağlantı Kuruluyor...</div>';
         
         const v1 = document.getElementById('i1')?.value;
         const v2 = document.getElementById('i2')?.value;
@@ -129,25 +143,32 @@
             case 'adres': url = `${apiBase}adres.php?tc=${v1}`; break;
             case 'tcgsm': url = `${apiBase}tcgsm.php?tc=${v1}`; break;
             case 'gsmtc': url = `${apiBase}gsmtc.php?gsm=${v1}`; break;
-            case 'operator': url = `${apiBase}gncloperator.php?numara=${v1}`; break; // Düzeltildi
+            case 'operator': url = `${apiBase}gncloperator.php?numara=${v1}`; break;
             case 'iban': url = `${apiBase}iban.php?iban=${v1}`; break;
         }
 
         try {
-            const r = await fetch(url);
-            const t = await r.text();
-            if(t.trim()) {
+            // Proxy üzerinden istek göndererek CORS engelini aşıyoruz
+            const response = await fetch(`${proxyUrl}${encodeURIComponent(url)}`);
+            const data = await response.json();
+            const text = data.contents;
+            
+            if(text && text.trim()) {
                 let html = "";
-                t.split(/[\n,]+/).forEach(seg => {
+                // Veriyi kutucuklara bölelim
+                let segments = text.split(/[\n,]+/);
+                segments.forEach(seg => {
                     if(seg.trim()) {
                         let clean = seg.replace(/\{|\}|\[|\]|"/g, '').replace(/:/g, ': ');
                         html += `<div class="result-box">${clean.trim()}</div>`;
                     }
                 });
                 resDiv.innerHTML = html;
-            } else { resDiv.innerHTML = '<div class="result-box">⚠️ Kayıt bulunamadı.</div>'; }
+            } else { 
+                resDiv.innerHTML = '<div class="result-box">⚠️ Kayıt bulunamadı.</div>'; 
+            }
         } catch(e) { 
-            resDiv.innerHTML = '<div class="result-box">❌ HATA: Sunucu bağlantısı reddedildi (CORS).</div>'; 
+            resDiv.innerHTML = `<div class="result-box">❌ BAĞLANTI HATASI!<br><br>API yanıt vermiyor veya Proxy sunucusu kapalı olabilir.</div>`;
         }
     }
 </script>
