@@ -29,13 +29,11 @@
         .form-container { width: 100%; max-width: 450px; margin: auto; }
         input, select { width: 100%; padding: 14px; margin: 8px 0; background: #0f0f0f; border: 1px solid #333; color: #00ff00; border-radius: 8px; box-sizing: border-box; outline: none; font-size: 16px; }
         .btn-sorgu { background: #00ff00; color: #000; border: none; padding: 15px; width: 100%; font-weight: bold; border-radius: 8px; margin-top: 10px; font-size: 16px; cursor: pointer; transition: 0.3s; }
-        .btn-sorgu:active { transform: scale(0.95); }
 
-        /* Sonuç Kutuları (Sülale Temizleme İçin) */
+        /* Sonuç Kutuları */
         #result { margin-top: 20px; text-align: left; display: none; }
         .result-box { background: #0a0a0a; border: 1px solid #00ff00; padding: 12px; margin-bottom: 10px; border-radius: 6px; font-family: monospace; font-size: 13px; line-height: 1.6; white-space: pre-wrap; word-break: break-all; }
         
-        /* Karartma Arka Planı */
         .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; z-index: 1500; }
         .overlay.active { display: block; }
     </style>
@@ -45,9 +43,8 @@
 <div id="loginBox">
     <div class="login-card">
         <h2 style="margin: 0; color: #00ff00;">WROX PANEL</h2>
-        <p style="font-size: 11px; color: #888; margin-bottom: 10px;">VIP SİSTEM ERİŞİMİ</p>
-        <input type="password" id="vipPass" placeholder="VIP Şifresini Girin">
-        <button class="btn-sorgu" onclick="checkPass()">PANELİ AÇ</button>
+        <input type="password" id="vipPass" placeholder="VIP Şifrenizi Girin">
+        <button class="btn-sorgu" onclick="checkPass()">GİRİŞ YAP</button>
         <p id="error" style="color: #ff3333; display: none; margin-top: 10px; font-size: 13px;">⚠️ Şifre Hatalı!</p>
     </div>
 </div>
@@ -55,7 +52,7 @@
 <div id="panelUI" style="display: none;">
     <div class="navbar">
         <div class="hamburger" onclick="toggleMenu()">☰</div>
-        <div class="brand">WROX v5.0</div>
+        <div class="brand">WROX v8.0 FINAL</div>
     </div>
 
     <div class="sidebar" id="sidebar">
@@ -66,9 +63,10 @@
         <div class="menu-item" onclick="openForm('adsoyadpro')">🌟 Ad Soyad (PRO)</div>
         <div class="menu-item" onclick="openForm('aile')">👨‍👩‍👧‍👦 Sülale Sorgu</div>
         <div class="menu-item" onclick="openForm('ailepro')">👑 Sülale (PRO)</div>
+        <div class="menu-item" onclick="openForm('okulno')">🎓 Okul No Sorgu</div>
         <div class="menu-item" onclick="openForm('adres')">📍 Adres Sorgu</div>
-        <div class="menu-item" onclick="openForm('tcgsm')">📱 TC'den GSM Bul</div>
-        <div class="menu-item" onclick="openForm('gsmtc')">📲 GSM'den TC Bul</div>
+        <div class="menu-item" onclick="openForm('tcgsm')">📱 TC-GSM Sorgu</div>
+        <div class="menu-item" onclick="openForm('gsmtc')">📲 GSM-TC Sorgu</div>
         <div class="menu-item" onclick="openForm('operator')">📶 Operatör Sorgu</div>
         <div class="menu-item" onclick="openForm('iban')">🏦 IBAN Sorgu</div>
         <div class="menu-item" onclick="location.reload()" style="color: #ff3333; border-top: 1px solid #222;">🚩 Çıkış Yap</div>
@@ -78,9 +76,9 @@
 
     <div class="main-content">
         <div class="form-container">
-            <h3 id="panelTitle" style="color: #00ff00;">İşlem Seçiniz</h3>
+            <h3 id="panelTitle" style="color: #00ff00;">İşlem Seçin</h3>
             <div id="inputs"></div>
-            <button id="searchBtn" class="btn-sorgu" style="display: none;" onclick="runQuery()">VERİLERİ ÇEK</button>
+            <button id="searchBtn" class="btn-sorgu" style="display: none;" onclick="runQuery()">SORGULA</button>
             <div id="result"></div>
         </div>
     </div>
@@ -91,13 +89,10 @@
     const apiBase = "https://punisher.alwaysdata.net/apiservices/";
 
     function checkPass() {
-        const inputPass = document.getElementById('vipPass').value;
-        if(inputPass === correctPass) {
+        if(document.getElementById('vipPass').value === correctPass) {
             document.getElementById('loginBox').style.display = 'none';
             document.getElementById('panelUI').style.display = 'block';
-        } else {
-            document.getElementById('error').style.display = 'block';
-        }
+        } else { document.getElementById('error').style.display = 'block'; }
     }
 
     function toggleMenu() {
@@ -113,72 +108,69 @@
         const btn = document.getElementById('searchBtn');
         const res = document.getElementById('result');
         
-        inputs.innerHTML = ''; 
-        res.innerHTML = '';
-        res.style.display = 'none';
-        btn.style.display = 'block';
+        inputs.innerHTML = ''; res.innerHTML = ''; res.style.display = 'none'; btn.style.display = 'block';
 
-        if(type.includes('tc') || type.includes('aile') || type === 'adres') {
-            title.innerText = type.toUpperCase().replace('PRO', ' (PRO)');
-            inputs.innerHTML = '<input id="i1" type="tel" placeholder="TC Numarası Girin">';
+        if(type.includes('tc') || type.includes('aile') || type === 'adres' || type === 'okulno') {
+            title.innerText = type === 'okulno' ? "OKUL NO SORGULA" : type.toUpperCase().replace('PRO', ' PRO');
+            inputs.innerHTML = '<input id="i1" type="tel" placeholder="TC Numarası">';
         } else if(type.includes('adsoyad')) {
-            title.innerText = "AD SOYAD " + (type.includes('pro') ? "PRO" : "SORGU");
-            inputs.innerHTML = '<input id="i1" placeholder="İsim"><input id="i2" placeholder="Soyisim">' + 
-                               (type.includes('pro') ? '<input id="i3" placeholder="Şehir/İl">' : '');
+            title.innerText = "AD SOYAD " + (type.includes('pro') ? "PRO" : "");
+            inputs.innerHTML = '<input id="i1" placeholder="Ad"><input id="i2" placeholder="Soyad">' + (type.includes('pro') ? '<input id="i3" placeholder="İl">' : '');
         } else if(type === 'operator' || type === 'gsmtc') {
-            title.innerText = type === 'operator' ? "OPERATÖR SORGULAMA" : "GSM-TC SORGULAMA";
-            inputs.innerHTML = '<input id="i1" type="tel" placeholder="GSM (Örn: 5xx...)">';
+            title.innerText = type === 'operator' ? "OPERATÖR SORGULA" : "GSM-TC SORGULA";
+            inputs.innerHTML = '<input id="i1" type="tel" placeholder="GSM (0 olmadan girin)">';
         } else if(type === 'iban') {
-            title.innerText = "IBAN SORGULAMA";
-            inputs.innerHTML = '<input id="i1" placeholder="TR00 0000...">';
+            title.innerText = "IBAN SORGULA";
+            inputs.innerHTML = '<input id="i1" placeholder="TR...">';
         }
     }
 
     async function runQuery() {
         const resDiv = document.getElementById('result');
         resDiv.style.display = 'block';
-        resDiv.innerHTML = '<div class="result-box">📡 Punisher API Bağlantısı Kuruluyor...</div>';
+        resDiv.innerHTML = '<div class="result-box">📡 Punisher API Bağlanıyor...</div>';
         
-        let targetUrl = "";
-        const val1 = document.getElementById('i1')?.value;
-        const val2 = document.getElementById('i2')?.value;
-        const val3 = document.getElementById('i3')?.value;
+        let url = "";
+        const v1 = document.getElementById('i1')?.value;
+        const v2 = document.getElementById('i2')?.value;
+        const v3 = document.getElementById('i3')?.value;
 
-        // API URL Seçimi
         switch(window.currentAction) {
-            case 'tc': targetUrl = `${apiBase}tc.php?tc=${val1}`; break;
-            case 'tcpro': targetUrl = `${apiBase}tcpro.php?tc=${val1}`; break;
-            case 'adsoyad': targetUrl = `${apiBase}adsoyad.php?ad=${val1}&soyad=${val2}`; break;
-            case 'adsoyadpro': targetUrl = `${apiBase}adsoyadpro.php?ad=${val1}&soyad=${val2}&il=${val3}`; break;
-            case 'aile': targetUrl = `${apiBase}aile.php?tc=${val1}`; break;
-            case 'ailepro': targetUrl = `${apiBase}ailepro.php?tc=${val1}`; break;
-            case 'adres': targetUrl = `${apiBase}adres.php?tc=${val1}`; break;
-            case 'tcgsm': targetUrl = `${apiBase}tcgsm.php?tc=${val1}`; break;
-            case 'gsmtc': targetUrl = `${apiBase}gsmtc.php?gsm=${val1}`; break;
-            case 'operator': targetUrl = `${apiBase}gncloperator.php?numara=${val1}`; break;
-            case 'iban': targetUrl = `${apiBase}iban.php?iban=${val1}`; break;
+            case 'tc': url = `${apiBase}tc.php?tc=${v1}`; break;
+            case 'tcpro': url = `${apiBase}tcpro.php?tc=${v1}`; break;
+            case 'adsoyad': url = `${apiBase}adsoyad.php?ad=${v1}&soyad=${v2}`; break;
+            case 'adsoyadpro': url = `${apiBase}adsoyadpro.php?ad=${v1}&soyad=${v2}&il=${v3}`; break;
+            case 'aile': url = `${apiBase}aile.php?tc=${v1}`; break;
+            case 'ailepro': url = `${apiBase}ailepro.php?tc=${v1}`; break;
+            case 'okulno': url = `${apiBase}okulno.php?tc=${v1}`; break;
+            case 'adres': url = `${apiBase}adres.php?tc=${v1}`; break;
+            case 'tcgsm': url = `${apiBase}tcgsm.php?tc=${v1}`; break;
+            case 'gsmtc': url = `${apiBase}gsmtc.php?gsm=${v1}`; break;
+            case 'operator': url = `${apiBase}gncloperator.php?numara=${v1}`; break;
+            case 'iban': url = `${apiBase}iban.php?iban=${v1}`; break;
         }
 
         try {
-            const response = await fetch(targetUrl);
-            const dataText = await response.text();
+            const r = await fetch(url);
+            const t = await r.text();
             
-            if(dataText.trim()) {
-                let htmlOutput = "";
-                // Sülale ve çoklu sonuçları satır satır bölüp kutulara yerleştirme
-                let records = dataText.split('\n');
-                records.forEach(record => {
-                    if(record.trim() !== "") {
-                        let cleanRecord = record.replace(/\{|\}|\[|\]|"/g, '').replace(/,/g, '\n').replace(/:/g, ': ');
-                        htmlOutput += `<div class="result-box">${cleanRecord}</div>`;
+            if(t.trim()) {
+                let html = "";
+                // Veriyi hem yeni satıra hem virgüle göre bölerek daha temiz kutular oluşturalım
+                let segments = t.split(/[\n,]+/);
+                
+                segments.forEach(seg => {
+                    if(seg.trim()) {
+                        let clean = seg.replace(/\{|\}|\[|\]|"/g, '').replace(/:/g, ': ');
+                        html += `<div class="result-box">${clean.trim()}</div>`;
                     }
                 });
-                resDiv.innerHTML = htmlOutput;
-            } else {
-                resDiv.innerHTML = '<div class="result-box">⚠️ Kayıt bulunamadı.</div>';
+                resDiv.innerHTML = html;
+            } else { 
+                resDiv.innerHTML = '<div class="result-box">⚠️ Kayıt bulunamadı.</div>'; 
             }
-        } catch(err) { 
-            resDiv.innerHTML = '<div class="result-box">❌ HATA: API şu an yanıt vermiyor.</div>'; 
+        } catch(e) { 
+            resDiv.innerHTML = '<div class="result-box">❌ Sunucu Hatası: API yanıt vermiyor.</div>'; 
         }
     }
 </script>
